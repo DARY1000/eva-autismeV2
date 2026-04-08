@@ -30,7 +30,7 @@
 
         <!-- Slide 2 -->
         <div class="hero-slide">
-            <img src="{{ asset('images/hero/hero-2.jpg') }}" alt="Formation parents - EVA Autisme">
+            <img src="{{ asset('images/hero/hero-2.jpg') }}" alt="Formation parents - EVA Autisme" onerror="this.src='{{ asset('images/hero/hero-1.jpg') }}'">
             <div class="hero-content">
                 <div class="hero-content-inner">
                     <span class="hero-badge">Formation & Accompagnement</span>

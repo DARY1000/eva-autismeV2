@@ -67,7 +67,7 @@ jobs:
             set -e
 
             echo "📂 Accès au projet..."
-            cd ${{ secrets.DEPLOY_PATH }}
+            cd /home/u712705282/domains/eva-autisme.org/public_html
 
             echo "⬇️  Récupération des nouvelles modifications..."
             git fetch origin main

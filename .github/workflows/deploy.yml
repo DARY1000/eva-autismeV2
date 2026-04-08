@@ -1,0 +1,115 @@
+name: 🚀 Deploy to Hostinger
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:          # Permet de déclencher manuellement depuis GitHub
+
+concurrency:
+  group: production
+  cancel-in-progress: false   # Ne pas annuler un déploiement en cours
+
+jobs:
+  # ─────────────────────────────────────────
+  # JOB 1 : Tests & build
+  # ─────────────────────────────────────────
+  test:
+    name: 🧪 Vérification du code
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      - name: Installation de PHP 8.2
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, pdo, pdo_mysql, bcmath, gd, exif, pcntl, zip
+          coverage: none
+
+      - name: Cache des dépendances Composer
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: composer-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-
+
+      - name: Installation des dépendances (production)
+        run: composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
+
+      - name: Vérification de la syntaxe PHP
+        run: find app config routes -name "*.php" | xargs php -l
+
+  # ─────────────────────────────────────────
+  # JOB 2 : Déploiement SSH sur Hostinger
+  # ─────────────────────────────────────────
+  deploy:
+    name: 🌍 Déploiement Hostinger
+    runs-on: ubuntu-latest
+    needs: test            # Attend que les tests passent
+    environment: production
+
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      - name: Déploiement via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host:     ${{ secrets.HOSTINGER_HOST }}
+          username: ${{ secrets.HOSTINGER_USERNAME }}
+          key:      ${{ secrets.HOSTINGER_SSH_KEY }}
+          port:     ${{ secrets.HOSTINGER_PORT }}
+          timeout:  120s
+          script: |
+            set -e
+
+            echo "📂 Accès au projet..."
+            cd ${{ secrets.DEPLOY_PATH }}
+
+            echo "⬇️  Récupération des nouvelles modifications..."
+            git fetch origin main
+            git reset --hard origin/main
+
+            echo "📦 Installation des dépendances PHP..."
+            composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
+
+            echo "⚙️  Maintenance activée..."
+            php artisan down --refresh=15 --retry=10 || true
+
+            echo "🗄️  Migrations de base de données..."
+            php artisan migrate --force
+
+            echo "🗂️  Lien symbolique Storage..."
+            php artisan storage:link || true
+
+            echo "🗑️  Nettoyage des caches..."
+            php artisan config:clear
+            php artisan route:clear
+            php artisan view:clear
+            php artisan cache:clear
+
+            echo "⚡ Mise en cache pour la production..."
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+            php artisan event:cache
+
+            echo "🔐 Permissions des fichiers..."
+            chmod -R 775 storage bootstrap/cache
+            chown -R $(whoami):$(whoami) storage bootstrap/cache
+
+            echo "✅ Maintenance désactivée..."
+            php artisan up
+
+            echo "🎉 Déploiement terminé avec succès !"
+
+      - name: Notification de succès
+        if: success()
+        run: echo "✅ Déploiement EVA Autisme réussi sur ${{ secrets.HOSTINGER_HOST }}"
+
+      - name: Notification d'échec
+        if: failure()
+        run: echo "❌ Échec du déploiement - vérifier les logs ci-dessus"

@@ -346,42 +346,36 @@
 <section class="section-teal section" style="padding:60px 0;">
     <div class="container">
         <div class="section-header reveal" style="margin-bottom:2rem;">
-            <span class="label">Nos Photos</span>
+            <span class="label">Médiathèque</span>
             <h2>EVA Autisme en Images</h2>
             <div class="section-divider" style="background:var(--teal);"></div>
             <p>Retrouvez nos événements, actions et moments forts en images.</p>
         </div>
-        <!-- Bande photos 4 colonnes -->
+        <!-- Bande photos 4 colonnes — gérées depuis Admin > Médias (album: accueil) -->
         <div class="photo-strip reveal">
+            @forelse($galleryPhotos as $photo)
             <div class="photo-strip-item">
-                <img src="{{ asset('images/gallery/photo-1.jpg') }}" alt="EVA Autisme - Photo 1" onerror="this.parentElement.classList.add('photo-strip-item-placeholder'); this.style.display='none'">
+                <img src="{{ $photo->file_path ? Storage::url($photo->file_path) : asset('images/gallery/photo-' . $loop->iteration . '.jpg') }}"
+                     alt="{{ $photo->alt_text ?: $photo->title }}"
+                     onerror="this.parentElement.classList.add('photo-strip-item-placeholder'); this.style.display='none'">
                 <div class="photo-strip-item-placeholder" style="display:none;">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                 </div>
             </div>
+            @empty
+            @foreach(range(1,4) as $i)
             <div class="photo-strip-item">
-                <img src="{{ asset('images/gallery/photo-2.jpg') }}" alt="EVA Autisme - Photo 2" onerror="this.parentElement.classList.add('photo-strip-item-placeholder'); this.style.display='none'">
+                <img src="{{ asset('images/gallery/photo-' . $i . '.jpg') }}" alt="EVA Autisme - Photo {{ $i }}" onerror="this.parentElement.classList.add('photo-strip-item-placeholder'); this.style.display='none'">
                 <div class="photo-strip-item-placeholder" style="display:none;">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                 </div>
             </div>
-            <div class="photo-strip-item">
-                <img src="{{ asset('images/gallery/photo-3.jpg') }}" alt="EVA Autisme - Photo 3" onerror="this.parentElement.classList.add('photo-strip-item-placeholder'); this.style.display='none'">
-                <div class="photo-strip-item-placeholder" style="display:none;">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                </div>
-            </div>
-            <div class="photo-strip-item">
-                <img src="{{ asset('images/gallery/photo-4.jpg') }}" alt="EVA Autisme - Photo 4" onerror="this.parentElement.classList.add('photo-strip-item-placeholder'); this.style.display='none'">
-                <div class="photo-strip-item-placeholder" style="display:none;">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                </div>
-            </div>
+            @endforeach
+            @endforelse
         </div>
         <div style="text-align:center;margin-top:1.5rem;">
             <a href="{{ route('resources.medias') }}" class="btn btn-teal">Voir toute la galerie</a>
         </div>
-        {{-- Note admin: Ajouter les photos dans public/images/gallery/photo-1.jpg à photo-4.jpg --}}
     </div>
 </section>
 

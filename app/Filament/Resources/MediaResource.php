@@ -33,7 +33,17 @@ class MediaResource extends Resource
                         'creation' => 'Création d\'enfant',
                     ])
                     ->required(),
-                Forms\Components\TextInput::make('album')->label('Album / Catégorie'),
+                Forms\Components\Select::make('album')
+                    ->label('Album / Catégorie')
+                    ->options([
+                        'accueil'       => 'Page d\'accueil (galerie)',
+                        'evenements'    => 'Événements',
+                        'formations'    => 'Formations',
+                        'sensibilisation' => 'Sensibilisation',
+                        'equipe'        => 'Équipe',
+                        'autre'         => 'Autre',
+                    ])
+                    ->searchable(),
                 Forms\Components\Textarea::make('description')->label('Description')->rows(2),
                 Forms\Components\TextInput::make('alt_text')->label('Texte alternatif (accessibilité)'),
                 Forms\Components\TextInput::make('file_url')

@@ -35,8 +35,8 @@
                 </div>
                 <!-- Badge année -->
                 <div style="position:absolute;bottom:-1.5rem;right:-1.5rem;background:var(--accent);color:#fff;border-radius:var(--radius-lg);padding:1.25rem 1.5rem;text-align:center;min-width:130px;box-shadow:var(--shadow-md);">
-                    <div style="font-size:2rem;font-weight:800;line-height:1;">2022</div>
-                    <div style="font-size:0.78rem;opacity:0.9;margin-top:3px;">Année de fondation</div>
+                    <div style="font-size:2rem;font-weight:800;line-height:1;">7 ans</div>
+                    <div style="font-size:0.78rem;opacity:0.9;margin-top:3px;">d'engagement</div>
                 </div>
             </div>
 

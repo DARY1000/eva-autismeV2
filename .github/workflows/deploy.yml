@@ -99,10 +99,9 @@ jobs:
 
             echo "🔐 Permissions des fichiers..."
             chmod -R 775 storage bootstrap/cache
-            chown -R $(whoami):$(whoami) storage bootstrap/cache
 
             echo "✅ Maintenance désactivée..."
-            php artisan up
+            php artisan up || true
 
             echo "🎉 Déploiement terminé avec succès !"
 

@@ -61,7 +61,7 @@ jobs:
           host:     ${{ secrets.HOSTINGER_HOST }}
           username: ${{ secrets.HOSTINGER_USERNAME }}
           key:      ${{ secrets.HOSTINGER_SSH_KEY }}
-          port:     ${{ secrets.HOSTINGER_PORT }}
+          port:     65002
           timeout:  120s
           script: |
             set -e

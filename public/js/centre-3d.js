@@ -202,30 +202,45 @@ function enclosure(parent) {
     for (const x of [-4, 4]) box(parent, [0.6, 3, 0.6], [x, 1.5, south], COLORS.wood);
 }
 
-function sign(parent) {
+// Enseigne au-dessus du portail, visible dès l'arrivée, avec le logo de l'ONG.
+function sign(parent, onReady) {
     const texture = document.createElement('canvas');
-    texture.width = 512;
-    texture.height = 128;
+    texture.width = 1024;
+    texture.height = 440;
     const context = texture.getContext('2d');
-    context.fillStyle = '#0055a5';
-    context.fillRect(0, 0, 512, 128);
     context.fillStyle = '#fff';
-    context.font = 'bold 56px Inter, sans-serif';
-    context.textAlign = 'center';
-    context.textBaseline = 'middle';
-    context.fillText('Centre EVA Autisme', 256, 66);
+    context.fillRect(0, 0, 1024, 440);
 
     const map = new THREE.CanvasTexture(texture);
     map.colorSpace = THREE.SRGBColorSpace;
-    const panel = new THREE.Mesh(new THREE.BoxGeometry(8, 2, 0.2), [
-        material(0x0055a5), material(0x0055a5), material(0x0055a5), material(0x0055a5),
-        new THREE.MeshStandardMaterial({ map }), material(0x0055a5),
+    map.anisotropy = 8;
+
+    const logo = new Image();
+    logo.onload = () => {
+        const height = 320;
+        const width = height * logo.naturalWidth / logo.naturalHeight;
+        context.drawImage(logo, (1024 - width) / 2, 12, width, height);
+        context.fillStyle = '#0055a5';
+        context.font = '700 62px Inter, sans-serif';
+        context.textAlign = 'center';
+        context.fillText('LE CENTRE', 512, 404);
+        map.needsUpdate = true;
+        onReady();
+    };
+    logo.src = new URL('../images/logo-eva.png', import.meta.url).href;
+
+    const edge = material(0x0055a5);
+    const panel = new THREE.Mesh(new THREE.BoxGeometry(11.4, 4.9, 0.3), [
+        edge, edge, edge, edge, new THREE.MeshStandardMaterial({ map, roughness: 0.7 }), edge,
     ]);
-    panel.position.set(-9.5, 2.4, 28.3);
+    panel.position.set(0, 5.6, 28);
+    panel.castShadow = true;
     parent.add(panel);
+
+    for (const x of [-4, 4]) box(parent, [0.5, 8, 0.5], [x, 4, 27.7], COLORS.wood);
 }
 
-function buildScene(scene) {
+function buildScene(scene, onReady) {
     const ground = new THREE.Mesh(new THREE.PlaneGeometry(240, 240), material(COLORS.ground));
     ground.rotation.x = -Math.PI / 2;
     ground.receiveShadow = true;
@@ -246,7 +261,7 @@ function buildScene(scene) {
     familyHouse(scene);
     housing(scene);
     enclosure(scene);
-    sign(scene);
+    sign(scene, onReady);
 
     for (const [x, z] of [[-28, 22], [-16, 24], [18, 24], [28, 20], [-28, -22], [28, -22], [-26, -36], [26, -36], [-28, 10], [28, 12]]) {
         tree(scene, x, z, 1.25);
@@ -276,7 +291,7 @@ function start(renderer) {
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
     addLights(scene);
-    buildScene(scene);
+    buildScene(scene, () => requestDraw());
 
     const controls = new OrbitControls(camera, canvas);
     controls.target.copy(OVERVIEW.target);

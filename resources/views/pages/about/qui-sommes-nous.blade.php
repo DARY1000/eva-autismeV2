@@ -232,7 +232,7 @@
 </section>
 
 <!-- ===================== CTA ===================== -->
-<section style="background:linear-gradient(135deg,var(--primary) 0%,#0073e6 100%);padding:80px 0;color:#fff;">
+<section class="band" style="padding:80px 0;color:#fff;">
     <div class="container" style="text-align:center;">
         <div class="reveal">
             <span style="display:inline-block;background:rgba(255,255,255,0.15);color:#fff;font-size:0.75rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:4px 14px;border-radius:30px;margin-bottom:1rem;">Agir ensemble</span>

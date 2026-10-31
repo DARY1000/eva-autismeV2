@@ -193,7 +193,7 @@ p  { color: var(--text-mid); line-height: 1.75; }
 }
 .navbar-logo img,
 .logo-img { height: 54px; width: auto; display: block; }
-.logo-img-footer { height: 50px; width: auto; display: block; margin-bottom: 0.75rem; }
+.logo-img-footer { height: 50px; width: auto; display: block; margin-bottom: 0.75rem; border-radius: 12px; }
 .navbar-logo-text .name {
     font-size: 1.3rem;
     font-weight: 800;
@@ -703,14 +703,17 @@ select.form-control { cursor: pointer; }
 /* ============================================================
    BREADCRUMB
    ============================================================ */
-.page-header {
+.page-header,
+.band {
     background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 60%, #001f5b 100%);
-    padding: 4.5rem 0 3.75rem;
     position: relative;
     overflow: hidden;
 }
+.page-header { padding: 4.5rem 0 3.75rem; }
+.band > .container, .band > .container-sm { position: relative; z-index: 1; }
 /* Subtle cross/dot pattern overlay */
-.page-header::before {
+.page-header::before,
+.band::before {
     content: '';
     position: absolute;
     inset: 0;
@@ -720,7 +723,8 @@ select.form-control { cursor: pointer; }
     pointer-events: none;
 }
 /* Decorative arc in top-right */
-.page-header::after {
+.page-header::after,
+.band::after {
     content: '';
     position: absolute;
     top: -80px;
@@ -1563,7 +1567,7 @@ select.form-control { cursor: pointer; }
    IMPACT NUMBERS BAND (colored)
    ============================================================ */
 .impact-band {
-    background: linear-gradient(135deg, var(--primary) 0%, #1a6dc9 100%);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 60%, #001f5b 100%);
     padding: 50px 0;
     color: #fff;
     position: relative;

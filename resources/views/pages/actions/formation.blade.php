@@ -247,7 +247,7 @@
 </section>
 
 <!-- ===================== CTA ===================== -->
-<section style="background:linear-gradient(135deg,var(--primary) 0%,#0073e6 100%);padding:70px 0;color:#fff;">
+<section class="band" style="padding:70px 0;color:#fff;">
     <div class="container" style="text-align:center;">
         <div class="reveal">
             <h2 style="color:#fff;margin-bottom:1rem;">Vous souhaitez organiser une formation pour votre structure ?</h2>

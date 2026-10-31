@@ -5,7 +5,7 @@
 
 @section('content')
 
-<section style="background:linear-gradient(135deg,var(--primary) 0%,#0073e6 100%);padding:5rem 0 4rem;color:#fff;text-align:center;">
+<section class="band" style="padding:5rem 0 4rem;color:#fff;text-align:center;">
     <div class="container">
         <div class="reveal">
             <span style="display:inline-block;background:rgba(255,255,255,0.15);color:#fff;font-size:0.75rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:4px 14px;border-radius:30px;margin-bottom:1rem;">Soutenir EVA Autisme</span>

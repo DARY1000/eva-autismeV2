@@ -33,7 +33,7 @@
                 <label class="pay-operator" data-country="{{ $option['country'] }}" @if($option['redirect'] ?? false) data-redirect="1" @endif>
                     <input type="radio" name="payment_method" value="{{ $network }}" @checked(old('payment_method') === $network)>
                     <span class="pay-operator-tile">
-                        <img src="{{ asset('images/payment/'.$option['logo'].'.png') }}" alt="" width="58" height="58" loading="lazy">
+                        <img src="{{ asset('images/payment/'.$option['logo'].'.png') }}?v={{ filemtime(public_path('images/payment/'.$option['logo'].'.png')) }}" alt="" width="58" height="58" loading="lazy">
                         <span>{{ $option['label'] }}</span>
                     </span>
                 </label>

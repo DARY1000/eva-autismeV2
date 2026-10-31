@@ -25,7 +25,7 @@ class DonationPaymentTest extends TestCase
     {
         return array_merge([
             'montant' => 5000, 'frequence' => 'ponctuel', 'prenom' => 'Amina', 'nom' => 'Dossou',
-            'email' => 'amina@example.org', 'telephone' => '01 97 00 00 00', 'payment_method' => 'mtn',
+            'email' => 'amina@example.org', 'telephone' => '01 97 00 00 00', 'pays' => 'BJ', 'payment_method' => 'mtn',
             '_form_ts' => Crypt::encryptString((string) (time() - 30)),
         ], $overrides);
     }
@@ -62,6 +62,66 @@ class DonationPaymentTest extends TestCase
 
         Http::assertNothingSent();
         $this->assertSame(0, Donation::count());
+    }
+
+    public function test_a_donor_can_give_from_100_cfa_but_not_less(): void
+    {
+        Http::fake(['sandbox-api.feexpay.me/*' => Http::response(['reference' => 'ref-1', 'status' => 'PENDING'])]);
+
+        $this->post(route('don.process'), $this->payload(['montant' => 99]))->assertSessionHasErrors('montant');
+        $this->assertSame(0, Donation::count());
+
+        $this->post(route('don.process'), $this->payload(['montant' => 100]))->assertSessionHasNoErrors();
+        $this->assertEquals(100, Donation::sole()->montant);
+    }
+
+    public function test_a_togolese_donor_pays_with_a_network_of_their_country(): void
+    {
+        Http::fake(['sandbox-api.feexpay.me/*' => Http::response(['reference' => 'ref-1', 'status' => 'PENDING'])]);
+
+        $this->post(route('don.process'), $this->payload([
+            'pays' => 'TG', 'telephone' => '90 12 34 56', 'payment_method' => 'togocom_tg',
+        ]))->assertSessionHasNoErrors();
+
+        $this->assertSame('Togo', Donation::sole()->pays);
+        Http::assertSent(fn ($request) => str_ends_with($request->url(), '/requesttopay/togocom_tg')
+            && $request['phoneNumber'] === '22890123456');
+    }
+
+    public function test_a_network_from_another_country_is_refused(): void
+    {
+        Http::fake();
+
+        $this->post(route('don.process'), $this->payload(['pays' => 'SN', 'telephone' => '77 123 45 67']))
+            ->assertSessionHasErrors('payment_method');
+
+        Http::assertNothingSent();
+    }
+
+    public function test_wave_sends_the_donor_to_the_operator_page_and_back(): void
+    {
+        Http::fake(['sandbox-api.feexpay.me/*' => Http::response([
+            'reference' => 'ref-1', 'status' => 'PENDING', 'payment_url' => 'https://pay.wave.com/c/test',
+        ])]);
+
+        $this->post(route('don.process'), $this->payload([
+            'pays' => 'SN', 'telephone' => '77 123 45 67', 'payment_method' => 'wave_sn',
+        ]))->assertRedirect('https://pay.wave.com/c/test');
+
+        $track = route('don.track', Donation::sole()->reference);
+        Http::assertSent(fn ($request) => $request['return_url'] === $track && $request['phoneNumber'] === '221771234567');
+    }
+
+    public function test_a_network_disabled_in_settings_is_refused(): void
+    {
+        config(['services.feexpay.disabled_networks' => ['wave_sn']]);
+        Http::fake();
+
+        $this->post(route('don.process'), $this->payload([
+            'pays' => 'SN', 'telephone' => '77 123 45 67', 'payment_method' => 'wave_sn',
+        ]))->assertSessionHasErrors('payment_method');
+
+        Http::assertNothingSent();
     }
 
     public function test_a_foreign_currency_amount_is_never_charged_in_cfa(): void

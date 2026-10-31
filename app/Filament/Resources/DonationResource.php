@@ -61,7 +61,7 @@ class DonationResource extends Resource
                 Tables\Columns\TextColumn::make('frequence')->label('Fréquence')->badge(),
                 Tables\Columns\TextColumn::make('payment_method')
                     ->label('Paiement')
-                    ->formatStateUsing(fn($state) => FeexPay::NETWORKS[$state] ?? ($state === 'card' ? 'Carte bancaire' : $state))
+                    ->formatStateUsing(fn($state) => FeexPay::NETWORKS[$state]['label'] ?? ($state === 'card' ? 'Carte bancaire' : $state))
                     ->placeholder('Hors ligne'),
                 Tables\Columns\BadgeColumn::make('status')
                     ->label('Statut')

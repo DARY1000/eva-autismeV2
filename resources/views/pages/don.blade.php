@@ -57,7 +57,7 @@
             <div class="form-group">
                 <label class="form-label">Devise</label>
                 <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.25rem;" id="currency-btns">
-                    <button type="button" class="currency-btn active" data-currency="XOF" data-symbol="F CFA" data-amounts="5000,10000,15000,25000,50000,100000" data-placeholder="Ex: 5000" data-min="500">
+                    <button type="button" class="currency-btn active" data-currency="XOF" data-symbol="F CFA" data-amounts="500,1000,2000,5000,10000,25000" data-placeholder="Ex: 5000" data-min="500">
                         🇧🇯 FCFA
                     </button>
                     <button type="button" class="currency-btn" data-currency="EUR" data-symbol="€" data-amounts="5,10,20,50,100,200" data-placeholder="Ex: 20" data-min="1">
@@ -77,12 +77,12 @@
             <div class="form-group">
                 <label class="form-label" id="amounts-label">Choisissez un montant</label>
                 <div style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-bottom:1rem;" id="amount-btns">
+                    <button type="button" class="btn btn-white-light amount-btn" data-amount="500">500 F CFA</button>
+                    <button type="button" class="btn btn-white-light amount-btn" data-amount="1000">1 000 F CFA</button>
+                    <button type="button" class="btn btn-white-light amount-btn" data-amount="2000">2 000 F CFA</button>
                     <button type="button" class="btn btn-white-light amount-btn" data-amount="5000">5 000 F CFA</button>
                     <button type="button" class="btn btn-white-light amount-btn" data-amount="10000">10 000 F CFA</button>
-                    <button type="button" class="btn btn-white-light amount-btn" data-amount="15000">15 000 F CFA</button>
                     <button type="button" class="btn btn-white-light amount-btn" data-amount="25000">25 000 F CFA</button>
-                    <button type="button" class="btn btn-white-light amount-btn" data-amount="50000">50 000 F CFA</button>
-                    <button type="button" class="btn btn-white-light amount-btn" data-amount="100000">100 000 F CFA</button>
                 </div>
             </div>
 
@@ -94,7 +94,8 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label" for="montant">Montant <span>*</span> <span id="devise-label" style="color:var(--primary);font-weight:700;">(F CFA)</span></label>
-                        <input type="number" class="form-control" name="montant" id="montant" placeholder="Ex: 5000" min="500" value="{{ old('montant') }}" required>
+                        <input type="number" class="form-control" name="montant" id="montant" placeholder="Votre montant, ex : 1 500" min="{{ \App\Services\FeexPay::MIN_AMOUNT }}" max="{{ \App\Services\FeexPay::MAX_AMOUNT }}" step="1" value="{{ old('montant') }}" required>
+                        <small style="color:var(--text-muted);">Montant libre, à partir de 100 F CFA.</small>
                         <input type="hidden" name="devise" id="devise-input" value="XOF">
                     </div>
                     <div class="form-group">
@@ -106,18 +107,28 @@
                     </div>
                 </div>
 
-                <!-- Mode de paiement -->
+                <!-- Pays et mode de paiement -->
+                <div class="form-group">
+                    <label class="form-label" for="don_pays">Votre pays <span>*</span></label>
+                    <select class="form-control" name="pays" id="don_pays" required>
+                        @foreach(\App\Services\FeexPay::COUNTRIES as $code => $country)
+                            <option value="{{ $code }}" data-dial="{{ $country['dial'] }}" data-example="{{ $country['example'] }}" @selected(old('pays', 'BJ') === $code)>{{ $country['name'] }} (+{{ $country['dial'] }})</option>
+                        @endforeach
+                    </select>
+                    <small style="color:var(--text-muted);">Vous êtes dans un autre pays ? <a href="{{ route('contact') }}">Contactez-nous</a> pour faire un don.</small>
+                </div>
+
                 <div class="form-group">
                     <label class="form-label">Mode de paiement <span>*</span></label>
-                    <div class="form-row" style="margin-top:0.5rem;flex-wrap:wrap;" id="payment-methods">
-                        @foreach(\App\Services\FeexPay::NETWORKS as $network => $label)
-                            <label class="payment-option" for="pay-{{ $network }}">
-                                <input type="radio" name="payment_method" id="pay-{{ $network }}" value="{{ $network }}" @checked(old('payment_method', 'mtn') === $network)>
+                    <div style="margin-top:0.5rem;" id="payment-methods">
+                        @foreach(\App\Services\FeexPay::availableNetworks() as $network => $option)
+                            <label class="payment-option" for="pay-{{ $network }}" data-country="{{ $option['country'] }}">
+                                <input type="radio" name="payment_method" id="pay-{{ $network }}" value="{{ $network }}" @checked(old('payment_method') === $network)>
                                 <span class="payment-option-inner">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:24px;height:24px"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                                    <img src="{{ asset('images/payment/'.$option['logo'].'.png') }}" alt="" class="payment-logo is-{{ $option['logo'] }}" width="44" height="44" loading="lazy">
                                     <span>
-                                        <strong>{{ $label }}</strong>
-                                        <small>Validation sur votre téléphone</small>
+                                        <strong>{{ $option['label'] }}</strong>
+                                        <small>{{ ($option['redirect'] ?? false) ? 'Paiement sur la page de l\'opérateur' : 'Validation sur votre téléphone' }}</small>
                                     </span>
                                 </span>
                             </label>
@@ -156,13 +167,9 @@
                         <input type="email" class="form-control" name="email" id="don_email" placeholder="votre@email.com" value="{{ old('email') }}" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label" for="don_tel">Téléphone <span>*</span></label>
+                        <label class="form-label" for="don_tel">Téléphone <span>*</span> <span id="don_dial" style="color:var(--primary);font-weight:700;"></span></label>
                         <input type="tel" class="form-control" name="telephone" id="don_tel" placeholder="01 XX XX XX XX" value="{{ old('telephone') }}" required>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="don_pays">Pays</label>
-                    <input type="text" class="form-control" name="pays" id="don_pays" placeholder="Bénin" value="{{ old('pays', 'Bénin') }}">
                 </div>
                 <div class="form-group">
                     <label class="form-label" for="don_msg">Message (optionnel)</label>
@@ -306,6 +313,28 @@
 
 @section('scripts')
 <script>
+// Pays : affiche ses réseaux et adapte le numéro attendu
+(function () {
+    const select = document.getElementById('don_pays');
+    const update = () => {
+        const options = [...document.querySelectorAll('#payment-methods [data-country]')];
+        options.forEach(option => {
+            const available = option.dataset.country === select.value;
+            option.hidden = !available;
+            if (!available) option.querySelector('input').checked = false;
+        });
+        const visible = options.filter(option => !option.hidden);
+        if (!visible.some(option => option.querySelector('input').checked) && visible.length) {
+            visible[0].querySelector('input').checked = true;
+        }
+        const country = select.selectedOptions[0];
+        document.getElementById('don_dial').textContent = '(+' + country.dataset.dial + ')';
+        document.getElementById('don_tel').placeholder = country.dataset.example;
+    };
+    select.addEventListener('change', update);
+    update();
+})();
+
 // Amount buttons
 document.querySelectorAll('.amount-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -314,6 +343,12 @@ document.querySelectorAll('.amount-btn').forEach(btn => {
         });
         btn.classList.add('btn-blue'); btn.classList.remove('btn-white-light');
         document.getElementById('montant').value = btn.dataset.amount;
+    });
+});
+
+document.getElementById('montant').addEventListener('input', () => {
+    document.querySelectorAll('.amount-btn').forEach(b => {
+        b.classList.remove('btn-blue'); b.classList.add('btn-white-light');
     });
 });
 

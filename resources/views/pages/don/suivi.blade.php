@@ -6,8 +6,8 @@
 <section class="section">
     <div class="container-sm" style="max-width:560px;text-align:center;" id="don-suivi" data-status="{{ $donation->status }}" data-url="{{ route('don.status', $donation->reference) }}">
         <div data-state="pending" @if($donation->status !== 'pending') hidden @endif>
-            <h1 style="font-size:1.8rem;">Validez le paiement sur votre téléphone</h1>
-            <p>Une demande de <strong>{{ number_format($donation->montant, 0, ',', ' ') }} FCFA</strong> vient d'être envoyée sur votre téléphone. Saisissez votre code secret pour la confirmer.</p>
+            <h1 style="font-size:1.8rem;">Validez votre paiement</h1>
+            <p>Votre don de <strong>{{ number_format($donation->montant, 0, ',', ' ') }} FCFA</strong> attend votre confirmation sur votre téléphone ou sur la page de votre opérateur.</p>
             <p style="color:var(--text-muted);font-size:0.9rem;" role="status">Cette page se met à jour automatiquement.</p>
         </div>
         <div data-state="completed" @if($donation->status !== 'completed') hidden @endif>

@@ -21,6 +21,8 @@ return [
         'webhook_secret' => env('FEEXPAY_WEBHOOK_SECRET'),
         // Le paiement par carte demande une validation KYB préalable chez FeexPay.
         'card_enabled'   => env('FEEXPAY_CARD_ENABLED', false),
+        // Réseaux non activés sur le compte FeexPay, séparés par des virgules (ex. wave_ci,wave_sn).
+        'disabled_networks' => array_filter(explode(',', (string) env('FEEXPAY_DISABLED_NETWORKS', ''))),
     ],
 
     'postmark' => [

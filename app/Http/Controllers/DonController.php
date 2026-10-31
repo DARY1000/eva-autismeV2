@@ -21,31 +21,42 @@ class DonController extends Controller
     public function process(Request $request, FeexPay $feexPay)
     {
         $validated = $request->validate([
-            'montant'        => ['required', 'integer', 'min:500', 'max:'.FeexPay::MAX_AMOUNT],
+            'montant'        => ['required', 'integer', 'min:'.FeexPay::MIN_AMOUNT, 'max:'.FeexPay::MAX_AMOUNT],
             'frequence'      => 'required|in:ponctuel,mensuel',
             'prenom'         => 'required|string|max:100',
             'nom'            => 'required|string|max:100',
             'email'          => 'required|email|max:255',
             'telephone'      => 'required|string|max:20',
-            'pays'           => 'nullable|string|max:100',
+            'pays'           => ['required', Rule::in(array_keys(FeexPay::COUNTRIES))],
             'ville'          => 'nullable|string|max:100',
             'message'        => 'nullable|string|max:1000',
-            'payment_method' => ['nullable', Rule::in([...array_keys(FeexPay::NETWORKS), 'card'])],
+            'payment_method' => ['nullable', Rule::in([...array_keys(FeexPay::availableNetworks()), 'card'])],
             'devise'         => 'nullable|in:XOF,EUR,USD,GBP',
         ]);
 
-        $method = FeexPay::isConfigured() ? ($validated['payment_method'] ?? 'mtn') : null;
-        $phone  = FeexPay::normalizeBeninPhone($validated['telephone']);
+        $country = $validated['pays'];
+        $method  = FeexPay::isConfigured() ? ($validated['payment_method'] ?? null) : null;
+        $phone   = FeexPay::normalizePhone($validated['telephone'], $country);
+
+        if (FeexPay::isConfigured() && ! $method) {
+            throw ValidationException::withMessages(['payment_method' => 'Choisissez votre moyen de paiement.']);
+        }
 
         // FeexPay encaisse en FCFA : un montant en devise serait débité tel quel.
         if ($method && ($validated['devise'] ?? 'XOF') !== 'XOF') {
             throw ValidationException::withMessages(['montant' => 'Le paiement en ligne se fait en francs CFA.']);
         }
 
-        if ($method && $method !== 'card' && ! $phone) {
-            throw ValidationException::withMessages([
-                'telephone' => 'Saisissez un numéro béninois à 10 chiffres commençant par 01.',
-            ]);
+        if ($method && $method !== 'card') {
+            if (FeexPay::NETWORKS[$method]['country'] !== $country) {
+                throw ValidationException::withMessages(['payment_method' => 'Ce moyen de paiement n\'est pas disponible dans ce pays.']);
+            }
+
+            if (! $phone) {
+                throw ValidationException::withMessages([
+                    'telephone' => 'Numéro invalide pour ce pays. Exemple : '.FeexPay::COUNTRIES[$country]['example'],
+                ]);
+            }
         }
 
         $donation = Donation::create([
@@ -53,7 +64,7 @@ class DonController extends Controller
             'nom'            => $validated['nom'],
             'email'          => $validated['email'],
             'telephone'      => $validated['telephone'],
-            'pays'           => $validated['pays'] ?? 'Bénin',
+            'pays'           => FeexPay::COUNTRIES[$country]['name'],
             'montant'        => $validated['montant'],
             'frequence'      => $validated['frequence'],
             'message'        => $validated['message'] ?? null,
@@ -75,13 +86,13 @@ class DonController extends Controller
             'description' => 'Don EVA Autisme',
             'city'        => $validated['ville'] ?? 'Cotonou',
             'zip'         => '00229',
-            'country'     => 'BJ',
+            'country'     => $country,
         ];
 
         try {
             $payment = $method === 'card'
                 ? $feexPay->requestCardPayment($phone ?? preg_replace('/\D/', '', $donation->telephone), (int) $donation->montant, $customer, 'don:'.$donation->reference)
-                : $feexPay->requestMobilePayment($method, $phone, (int) $donation->montant, $customer, 'don:'.$donation->reference);
+                : $feexPay->requestMobilePayment($method, $phone, (int) $donation->montant, $customer, 'don:'.$donation->reference, route('don.track', $donation->reference));
         } catch (RuntimeException $e) {
             Log::error('Paiement FeexPay refusé', ['don' => $donation->reference, 'error' => $e->getMessage()]);
             $donation->update(['status' => 'failed', 'payment_failure_reason' => 'Demande refusée par FeexPay']);
@@ -91,7 +102,7 @@ class DonController extends Controller
 
         $donation->update(['payment_reference' => $payment['reference'] ?? null]);
 
-        if ($method === 'card' && filled($payment['payment_url'] ?? null)) {
+        if (filled($payment['payment_url'] ?? null)) {
             return redirect()->away($payment['payment_url']);
         }
 

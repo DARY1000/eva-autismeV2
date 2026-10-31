@@ -13,10 +13,36 @@ use RuntimeException;
  */
 class FeexPay
 {
+    /** pattern : numéro complet attendu par FeexPay ; length : chiffres du numéro local. */
+    public const COUNTRIES = [
+        'BJ' => ['name' => 'Bénin', 'dial' => '229', 'length' => 10, 'pattern' => '/^22901\d{8}$/', 'example' => '01 97 00 00 00'],
+        'TG' => ['name' => 'Togo', 'dial' => '228', 'length' => 8, 'pattern' => '/^228\d{8}$/', 'example' => '90 00 00 00'],
+        'CI' => ['name' => 'Côte d\'Ivoire', 'dial' => '225', 'length' => 10, 'pattern' => '/^225\d{10}$/', 'example' => '05 07 70 00 00'],
+        'SN' => ['name' => 'Sénégal', 'dial' => '221', 'length' => 9, 'pattern' => '/^221\d{9}$/', 'example' => '77 000 00 00'],
+        'BF' => ['name' => 'Burkina Faso', 'dial' => '226', 'length' => 8, 'pattern' => '/^226\d{8}$/', 'example' => '70 00 00 00'],
+        'CG' => ['name' => 'Congo-Brazzaville', 'dial' => '242', 'length' => 9, 'pattern' => '/^242\d{9}$/', 'example' => '06 100 0000'],
+    ];
+
+    /**
+     * Réseaux à validation simple. redirect : le client paie sur la page de l'opérateur.
+     * Coris Bénin et Orange Burkina, qui exigent un code à saisir, ne sont pas proposés.
+     */
     public const NETWORKS = [
-        'mtn'        => 'MTN Mobile Money',
-        'moov'       => 'Moov Money',
-        'celtiis_bj' => 'Celtiis Cash',
+        'mtn'        => ['label' => 'MTN Mobile Money', 'country' => 'BJ', 'logo' => 'mtn'],
+        'moov'       => ['label' => 'Moov Money', 'country' => 'BJ', 'logo' => 'moov'],
+        'celtiis_bj' => ['label' => 'Celtiis Cash', 'country' => 'BJ', 'logo' => 'celtiis'],
+        'togocom_tg' => ['label' => 'T-Money', 'country' => 'TG', 'logo' => 'mixx'],
+        'moov_tg'    => ['label' => 'Flooz', 'country' => 'TG', 'logo' => 'flooz'],
+        'mtn_ci'     => ['label' => 'MTN Mobile Money', 'country' => 'CI', 'logo' => 'mtn'],
+        'moov_ci'    => ['label' => 'Moov Money', 'country' => 'CI', 'logo' => 'moov', 'redirect' => true],
+        'wave_ci'    => ['label' => 'Wave', 'country' => 'CI', 'logo' => 'wave', 'redirect' => true],
+        'orange_ci'  => ['label' => 'Orange Money', 'country' => 'CI', 'logo' => 'orange', 'redirect' => true],
+        'orange_sn'  => ['label' => 'Orange Money', 'country' => 'SN', 'logo' => 'orange', 'redirect' => true],
+        'wave_sn'    => ['label' => 'Wave', 'country' => 'SN', 'logo' => 'wave', 'redirect' => true],
+        'free_sn'    => ['label' => 'Free Money', 'country' => 'SN', 'logo' => 'mixx'],
+        'moov_bf'    => ['label' => 'Moov Money', 'country' => 'BF', 'logo' => 'moov'],
+        'wave_bf'    => ['label' => 'Wave', 'country' => 'BF', 'logo' => 'wave', 'redirect' => true],
+        'mtn_cg'     => ['label' => 'MTN Mobile Money', 'country' => 'CG', 'logo' => 'mtn'],
     ];
 
     public const MIN_AMOUNT = 100;
@@ -28,26 +54,30 @@ class FeexPay
         return filled(config('services.feexpay.shop_id')) && filled(config('services.feexpay.api_key'));
     }
 
-    /** Numéro béninois au format attendu par FeexPay (22901XXXXXXXX), ou null s'il est invalide. */
-    public static function normalizeBeninPhone(string $phone): ?string
+    /** Réseaux proposés, sans ceux désactivés dans FEEXPAY_DISABLED_NETWORKS. */
+    public static function availableNetworks(): array
     {
+        return array_diff_key(self::NETWORKS, array_flip(config('services.feexpay.disabled_networks', [])));
+    }
+
+    /** Numéro au format attendu par FeexPay (indicatif + numéro), ou null s'il ne correspond pas au pays. */
+    public static function normalizePhone(string $phone, string $country): ?string
+    {
+        $rules  = self::COUNTRIES[$country];
         $digits = preg_replace('/\D/', '', $phone);
 
-        if (str_starts_with($digits, '00229')) {
+        if (str_starts_with($digits, '00')) {
             $digits = substr($digits, 2);
         }
-        if (strlen($digits) === 13 && str_starts_with($digits, '22901')) {
-            return $digits;
-        }
-        if (strlen($digits) === 10 && str_starts_with($digits, '01')) {
-            return '229'.$digits;
+        if (strlen($digits) === $rules['length']) {
+            $digits = $rules['dial'].$digits;
         }
 
-        return null;
+        return preg_match($rules['pattern'], $digits) ? $digits : null;
     }
 
     /** Envoie la demande de paiement sur le téléphone du client. */
-    public function requestMobilePayment(string $network, string $phone, int $amount, array $customer, string $callbackInfo): array
+    public function requestMobilePayment(string $network, string $phone, int $amount, array $customer, string $callbackInfo, ?string $returnUrl = null): array
     {
         if (! array_key_exists($network, self::NETWORKS)) {
             throw new RuntimeException("Réseau inconnu : {$network}");
@@ -61,6 +91,7 @@ class FeexPay
             'last_name'     => $customer['last_name'],
             'description'   => $customer['description'],
             'callback_info' => $callbackInfo,
+            ...(self::NETWORKS[$network]['redirect'] ?? false ? ['return_url' => $returnUrl, 'cancel_url' => $returnUrl] : []),
         ]);
     }
 

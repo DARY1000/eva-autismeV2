@@ -202,7 +202,7 @@ function enclosure(parent) {
     for (const x of [-4, 4]) box(parent, [0.6, 3, 0.6], [x, 1.5, south], COLORS.wood);
 }
 
-// Enseigne au-dessus du portail, visible dès l'arrivée, avec le logo de l'ONG.
+// Grande pancarte sur le mur d'enceinte, à côté du portail, avec le logo de l'ONG.
 function sign(parent, onReady) {
     const texture = document.createElement('canvas');
     texture.width = 1024;
@@ -230,14 +230,12 @@ function sign(parent, onReady) {
     logo.src = new URL('../images/logo-eva.png', import.meta.url).href;
 
     const edge = material(0x0055a5);
-    const panel = new THREE.Mesh(new THREE.BoxGeometry(11.4, 4.9, 0.3), [
+    const panel = new THREE.Mesh(new THREE.BoxGeometry(16, 6.9, 0.3), [
         edge, edge, edge, edge, new THREE.MeshStandardMaterial({ map, roughness: 0.7 }), edge,
     ]);
-    panel.position.set(0, 5.6, 28);
+    panel.position.set(-16, 3.6, 28.3);
     panel.castShadow = true;
     parent.add(panel);
-
-    for (const x of [-4, 4]) box(parent, [0.5, 8, 0.5], [x, 4, 27.7], COLORS.wood);
 }
 
 function buildScene(scene, onReady) {

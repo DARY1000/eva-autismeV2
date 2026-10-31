@@ -17,6 +17,8 @@ class FeexPayWebhookController extends Controller
         $secret = config('services.feexpay.webhook_secret');
 
         if (filled($secret) && ! hash_equals($secret, (string) $request->bearerToken())) {
+            Log::warning('Webhook FeexPay refusé : secret incorrect');
+
             return response('', 401);
         }
 
@@ -25,6 +27,8 @@ class FeexPayWebhookController extends Controller
 
         // Référence inconnue : FeexPay n'a pas à réessayer.
         if (! $donation) {
+            Log::info('Webhook FeexPay ignoré : référence inconnue', ['reference' => $reference]);
+
             return response('', 200);
         }
 
@@ -36,6 +40,8 @@ class FeexPayWebhookController extends Controller
 
             return response('', 503);
         }
+
+        Log::info('Webhook FeexPay traité', ['don' => $donation->reference, 'status' => $donation->status]);
 
         return response('', 200);
     }

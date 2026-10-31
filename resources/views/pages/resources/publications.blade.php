@@ -151,8 +151,7 @@
         opacity: 0.88;
         max-width: 540px;
         margin: 0 auto 1.75rem;
-        line-height: 1.6;
-    }
+        line-height: 1.6; color: #fff; }
     .badge-rapport    { --bcolor: #0055A5; }
     .badge-guide      { --bcolor: #059669; }
     .badge-article    { --bcolor: #7c3aed; }

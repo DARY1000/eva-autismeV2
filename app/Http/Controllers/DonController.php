@@ -109,23 +109,32 @@ class DonController extends Controller
         return redirect()->route('don.track', $donation->reference);
     }
 
-    public function track(string $reference)
+    public function track(string $reference, FeexPay $feexPay)
     {
-        return view('pages.don.suivi', [
-            'donation' => Donation::where('reference', $reference)->firstOrFail(),
-        ]);
+        $donation = Donation::where('reference', $reference)->firstOrFail();
+        $this->sync($donation, $feexPay);
+
+        return view('pages.don.suivi', compact('donation'));
     }
 
     public function status(string $reference, FeexPay $feexPay): JsonResponse
     {
         $donation = Donation::where('reference', $reference)->firstOrFail();
+        $this->sync($donation, $feexPay);
 
+        return response()->json([
+            'status' => $donation->status,
+            'reason' => $donation->status === 'failed' ? $donation->failure_message : null,
+        ]);
+    }
+
+    private function sync(Donation $donation, FeexPay $feexPay): void
+    {
         try {
             $donation->syncPayment($feexPay);
-        } catch (RuntimeException) {
+        } catch (RuntimeException $e) {
             // Coupure passagère : la page continue d'interroger, le webhook prendra le relais.
+            Log::warning('Statut FeexPay indisponible', ['don' => $donation->reference, 'error' => $e->getMessage()]);
         }
-
-        return response()->json(['status' => $donation->status]);
     }
 }

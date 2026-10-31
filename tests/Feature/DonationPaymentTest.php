@@ -165,6 +165,29 @@ class DonationPaymentTest extends TestCase
         $this->assertSame('failed', $donation->fresh()->status);
     }
 
+    public function test_the_status_endpoint_gives_the_reason_of_a_failure(): void
+    {
+        Http::fake(['*/single/status/ref-1' => Http::response([
+            'status' => 'FAILED', 'amount' => 5000, 'reason' => 'LOW_BALANCE_OR_PAYEE_LIMIT_REACHED_OR_NOT_ALLOWED',
+        ])]);
+        $donation = $this->pendingDonation();
+
+        $this->getJson(route('don.status', $donation->reference))->assertExactJson([
+            'status' => 'failed',
+            'reason' => 'Votre solde est insuffisant ou votre plafond est atteint.',
+        ]);
+    }
+
+    public function test_reloading_the_tracking_page_confirms_a_paid_donation(): void
+    {
+        Http::fake(['*/single/status/ref-1' => Http::response(['status' => 'SUCCESSFUL', 'amount' => 5000])]);
+        $donation = $this->pendingDonation();
+
+        $this->get(route('don.track', $donation->reference))->assertOk()->assertSee('Paiement réussi');
+
+        $this->assertSame('completed', $donation->fresh()->status);
+    }
+
     public function test_feexpay_being_down_asks_for_a_webhook_retry(): void
     {
         Http::fake(['*/single/status/ref-1' => Http::response('', 500)]);

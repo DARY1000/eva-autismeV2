@@ -198,8 +198,35 @@ function enclosure(parent) {
     box(parent, [0.3, 1.7, south - north], [east, 0.85, (north + south) / 2], COLORS.wall);
     box(parent, [28, 1.7, 0.3], [-18, 0.85, south], COLORS.wall);
     box(parent, [28, 1.7, 0.3], [18, 0.85, south], COLORS.wall);
-    box(parent, [8, 0.2, 0.3], [0, 2.8, south], COLORS.roof);
-    for (const x of [-4, 4]) box(parent, [0.6, 3, 0.6], [x, 1.5, south], COLORS.wood);
+    for (const x of [-4.2, 4.2]) box(parent, [0.6, 4.4, 0.6], [x, 2.2, south], COLORS.wood);
+    gateName(parent, south);
+}
+
+// Le nom du centre, en haut du portail.
+function gateName(parent, z) {
+    const texture = document.createElement('canvas');
+    texture.width = 1024;
+    texture.height = 170;
+    const context = texture.getContext('2d');
+    context.fillStyle = '#0055a5';
+    context.fillRect(0, 0, 1024, 170);
+    context.fillStyle = '#fff';
+    context.font = '800 92px Inter, sans-serif';
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
+    context.fillText('LE CENTRE NESA', 512, 90);
+
+    const map = new THREE.CanvasTexture(texture);
+    map.colorSpace = THREE.SRGBColorSpace;
+    map.anisotropy = 8;
+
+    const edge = material(0x0055a5);
+    const name = new THREE.Mesh(new THREE.BoxGeometry(9.6, 1.6, 0.4), [
+        edge, edge, edge, edge, new THREE.MeshStandardMaterial({ map, roughness: 0.7 }), edge,
+    ]);
+    name.position.set(0, 4, z + 0.4);
+    name.castShadow = true;
+    parent.add(name);
 }
 
 // Grande pancarte sur le mur d'enceinte, à côté du portail, avec le logo de l'ONG.
@@ -217,13 +244,9 @@ function sign(parent, onReady) {
 
     const logo = new Image();
     logo.onload = () => {
-        const height = 320;
+        const height = 400;
         const width = height * logo.naturalWidth / logo.naturalHeight;
-        context.drawImage(logo, (1024 - width) / 2, 12, width, height);
-        context.fillStyle = '#0055a5';
-        context.font = '700 62px Inter, sans-serif';
-        context.textAlign = 'center';
-        context.fillText('LE CENTRE', 512, 404);
+        context.drawImage(logo, (1024 - width) / 2, 20, width, height);
         map.needsUpdate = true;
         onReady();
     };

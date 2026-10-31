@@ -34,7 +34,8 @@ Route::prefix('nos-actions')->name('actions.')->group(function () {
     Route::get('/nos-activites',        [ActionsController::class, 'activites'])->name('activites');
     Route::get('/nos-activites/{activity}', [ActionsController::class, 'activite'])->name('activites.show');
     Route::get('/nos-projets',          [ActionsController::class, 'projets'])->name('projets');
-    Route::get('/le-centre-eva',        [ActionsController::class, 'centre'])->name('centre');
+    Route::get('/le-centre-nesa',       [ActionsController::class, 'centre'])->name('centre');
+    Route::permanentRedirect('/le-centre-eva', '/nos-actions/le-centre-nesa');
     Route::get('/nos-realisations',     [ActionsController::class, 'realisations'])->name('realisations');
     Route::get('/formation',            [ActionsController::class, 'formation'])->name('formation');
     Route::post('/formation/inscription',[ActionsController::class, 'registerFormation'])->middleware(['throttle:forms', 'form.guard'])->name('formation.register');

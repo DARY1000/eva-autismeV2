@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Le Centre EVA Autisme')
-@section('meta_description', 'Découvrez en 3D le projet de centre de jour et de logement adapté de l\'ONG EVA Autisme au Bénin : éducation, thérapies, formation et soutien aux familles.')
+@section('title', 'Le Centre NESA')
+@section('meta_description', 'Découvrez en 3D le Centre NESA, projet de centre de jour et de logement adapté de l\'ONG EVA Autisme au Bénin : éducation, thérapies, formation et soutien aux familles.')
 
 @section('styles')
 <script type="importmap">{"imports":{"three":"{{ asset('js/vendor/three/three.module.min.js') }}"}}</script>
@@ -12,14 +12,14 @@
 <div class="page-header">
     <div class="container">
         <span class="centre-status">Projet en préparation</span>
-        <h1>Le Centre EVA Autisme</h1>
+        <h1>Le Centre NESA</h1>
         <p>Un centre de jour et de logement adapté pour les personnes autistes et leurs familles au Bénin</p>
         <nav class="breadcrumb">
             <a href="{{ route('home') }}">Accueil</a>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:14px;height:14px"><polyline points="9 18 15 12 9 6"/></svg>
             <a href="{{ route('actions.projets') }}">Nos Projets</a>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:14px;height:14px"><polyline points="9 18 15 12 9 6"/></svg>
-            <span>Le Centre</span>
+            <span>Le Centre NESA</span>
         </nav>
     </div>
 </div>
@@ -136,7 +136,7 @@
 
         <div class="centre-context reveal">
             <p>Le centre prolongera aussi l'action déjà engagée par l'État : une phase pilote de prise en charge des enfants autistes a été lancée en juin 2024 à Cotonou et à Abomey-Calavi, et le Conseil des ministres du 2 septembre 2026 a exonéré de frais de scolarité 5 000 élèves handicapés.</p>
-            <p><strong>Le Centre EVA Autisme est un projet de l'ONG EVA Autisme.</strong> Ce n'est pas un programme de l'État et il ne bénéficie à ce jour d'aucune validation officielle.</p>
+            <p><strong>Le Centre NESA est un projet de l'ONG EVA Autisme.</strong> Ce n'est pas un programme de l'État et il ne bénéficie à ce jour d'aucune validation officielle.</p>
             <details>
                 <summary>Voir les sources (octobre 2026)</summary>
                 <ul>

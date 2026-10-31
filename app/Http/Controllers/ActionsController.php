@@ -9,7 +9,7 @@ use App\Models\Contact;
 use App\Models\Formation;
 use App\Models\Project;
 use App\Models\Media;
-use App\Support\CentreEva;
+use App\Support\CentreNesa;
 use Illuminate\Http\Request;
 
 class ActionsController extends Controller
@@ -23,10 +23,10 @@ class ActionsController extends Controller
     public function centre()
     {
         return view('pages.actions.centre', [
-            'zones'      => CentreEva::ZONES,
-            'principles' => CentreEva::DESIGN_PRINCIPLES,
-            'alignment'  => CentreEva::ALIGNMENT,
-            'sources'    => CentreEva::SOURCES,
+            'zones'      => CentreNesa::ZONES,
+            'principles' => CentreNesa::DESIGN_PRINCIPLES,
+            'alignment'  => CentreNesa::ALIGNMENT,
+            'sources'    => CentreNesa::SOURCES,
         ]);
     }
 

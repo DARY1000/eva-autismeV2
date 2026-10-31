@@ -3,7 +3,7 @@
 namespace App\Support;
 
 /** Contenu de la page du projet de centre, partagé entre le texte et la maquette 3D. */
-class CentreEva
+class CentreNesa
 {
     /** Les clés correspondent aux bâtiments construits dans public/js/centre-3d.js. */
     public const ZONES = [

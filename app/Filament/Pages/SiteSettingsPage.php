@@ -3,7 +3,9 @@
 namespace App\Filament\Pages;
 
 use App\Models\SiteSetting;
+use App\Support\BeninDepartments;
 use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
@@ -34,6 +36,11 @@ class SiteSettingsPage extends Page implements HasForms
         $values = [];
         foreach ($keys as $key) {
             $values[$key] = SiteSetting::get($key);
+        }
+
+        foreach (BeninDepartments::map()['departments'] as $key => $department) {
+            $values["dept_status_{$key}"] = SiteSetting::get("dept_status_{$key}", BeninDepartments::defaultStatus($key));
+            $values["dept_note_{$key}"]   = SiteSetting::get("dept_note_{$key}", BeninDepartments::defaultDescription($key));
         }
 
         $this->form->fill($values);
@@ -68,8 +75,30 @@ class SiteSettingsPage extends Page implements HasForms
                             ->url()
                             ->placeholder('https://youtube.com/@evaautisme'),
                     ])->columns(2),
+                Section::make('Présence par département')
+                    ->description('Page Notre Impact : colore la carte du Bénin et remplit la liste des zones d\'intervention.')
+                    ->icon('heroicon-o-map')
+                    ->schema($this->departmentFields())
+                    ->columns(2),
             ])
             ->statePath('data');
+    }
+
+    private function departmentFields(): array
+    {
+        return collect(BeninDepartments::map()['departments'])
+            ->sortBy('name')
+            ->flatMap(fn (array $department, string $key) => [
+                Select::make("dept_status_{$key}")
+                    ->label($department['name'])
+                    ->options(BeninDepartments::STATUSES)
+                    ->selectablePlaceholder(false)
+                    ->required(),
+                TextInput::make("dept_note_{$key}")
+                    ->label('Description')
+                    ->maxLength(120),
+            ])
+            ->all();
     }
 
     public function save(): void

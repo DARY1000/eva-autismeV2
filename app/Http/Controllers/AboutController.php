@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Models\TeamMember;
 use App\Models\Partner;
+use App\Support\BeninDepartments;
 
 class AboutController extends Controller
 {
@@ -19,7 +20,7 @@ class AboutController extends Controller
 
     public function impact()
     {
-        return view('pages.about.impact');
+        return view('pages.about.impact', ['benin' => BeninDepartments::all()]);
     }
 
     public function demarche()

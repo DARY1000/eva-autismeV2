@@ -43,8 +43,7 @@ class TeamMemberResource extends Resource
                     ->image()
                     ->directory('team')
                     ->imageResizeMode('cover')
-                    ->imageCropAspectRatio('1:1')
-                    ->circular(),
+                    ->imageCropAspectRatio('1:1'),
                 Forms\Components\TextInput::make('email')
                     ->label('Email (optionnel)')
                     ->email()

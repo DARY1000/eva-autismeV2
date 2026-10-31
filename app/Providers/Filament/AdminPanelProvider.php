@@ -76,6 +76,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->navigationGroups([
                 'Nos Actions',
+                'Boutique',
                 'Médias & Publications',
                 'Relations',
                 'À Propos',

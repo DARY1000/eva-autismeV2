@@ -5,11 +5,12 @@ namespace App\Services;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Validation\ValidationException;
 use RuntimeException;
 
 /**
- * Client de l'API FeexPay v2. Utilisé par les dons et, plus tard, par la boutique :
- * le préfixe de callback_info (« don:… ») indique à quoi correspond un paiement.
+ * Client de l'API FeexPay v2, utilisé par les dons et la boutique :
+ * le préfixe de callback_info (« don:… », « cmd:… ») indique à quoi correspond un paiement.
  */
 class FeexPay
 {
@@ -74,6 +75,38 @@ class FeexPay
         }
 
         return preg_match($rules['pattern'], $digits) ? $digits : null;
+    }
+
+    /**
+     * Vérifie que le moyen de paiement correspond au pays et renvoie le numéro normalisé.
+     * Pour la carte, le numéro est facultatif : null s'il ne correspond pas au pays.
+     */
+    public static function validateChoice(string $method, string $country, string $phone): ?string
+    {
+        $normalized = self::normalizePhone($phone, $country);
+
+        if ($method === 'card') {
+            return $normalized;
+        }
+
+        if (self::NETWORKS[$method]['country'] !== $country) {
+            throw ValidationException::withMessages(['payment_method' => 'Ce moyen de paiement n\'est pas disponible dans ce pays.']);
+        }
+
+        if (! $normalized) {
+            throw ValidationException::withMessages([
+                'telephone' => 'Numéro invalide pour ce pays. Exemple : '.self::COUNTRIES[$country]['example'],
+            ]);
+        }
+
+        return $normalized;
+    }
+
+    public function startPayment(string $method, string $phone, int $amount, array $customer, string $callbackInfo, string $returnUrl): array
+    {
+        return $method === 'card'
+            ? $this->requestCardPayment($phone, $amount, $customer, $callbackInfo)
+            : $this->requestMobilePayment($method, $phone, $amount, $customer, $callbackInfo, $returnUrl);
     }
 
     /** Envoie la demande de paiement sur le téléphone du client. */

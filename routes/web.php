@@ -5,6 +5,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AboutController;
 use App\Http\Controllers\ActionsController;
 use App\Http\Controllers\ResourcesController;
+use App\Http\Controllers\ShopController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DonController;
 use App\Http\Controllers\NewsletterController;
@@ -33,6 +34,7 @@ Route::prefix('nos-actions')->name('actions.')->group(function () {
     Route::get('/nos-activites',        [ActionsController::class, 'activites'])->name('activites');
     Route::get('/nos-activites/{activity}', [ActionsController::class, 'activite'])->name('activites.show');
     Route::get('/nos-projets',          [ActionsController::class, 'projets'])->name('projets');
+    Route::get('/le-centre-eva',        [ActionsController::class, 'centre'])->name('centre');
     Route::get('/nos-realisations',     [ActionsController::class, 'realisations'])->name('realisations');
     Route::get('/formation',            [ActionsController::class, 'formation'])->name('formation');
     Route::post('/formation/inscription',[ActionsController::class, 'registerFormation'])->middleware(['throttle:forms', 'form.guard'])->name('formation.register');
@@ -64,6 +66,18 @@ Route::get('/faire-un-don',      [DonController::class, 'index'])->name('don');
 Route::post('/faire-un-don',     [DonController::class, 'process'])->middleware(['throttle:forms', 'form.guard'])->name('don.process');
 Route::get('/faire-un-don/suivi/{reference}',  [DonController::class, 'track'])->name('don.track');
 Route::get('/faire-un-don/statut/{reference}', [DonController::class, 'status'])->middleware('throttle:40,1')->name('don.status');
+Route::prefix('boutique')->name('boutique.')->group(function () {
+    Route::get('/',                      [ShopController::class, 'index'])->name('index');
+    Route::get('/produit/{product}',     [ShopController::class, 'show'])->name('show');
+    Route::get('/panier',                [ShopController::class, 'cart'])->name('panier');
+    Route::post('/panier/{product}',     [ShopController::class, 'add'])->name('panier.add');
+    Route::patch('/panier/{product}',    [ShopController::class, 'update'])->name('panier.update');
+    Route::get('/commande',              [ShopController::class, 'checkout'])->name('commande');
+    Route::post('/commande',             [ShopController::class, 'placeOrder'])->middleware(['throttle:forms', 'form.guard'])->name('commande.store');
+    Route::get('/suivi/{reference}',     [ShopController::class, 'track'])->name('suivi');
+    Route::get('/statut/{reference}',    [ShopController::class, 'status'])->middleware('throttle:40,1')->name('statut');
+});
+
 Route::post('/webhooks/feexpay', FeexPayWebhookController::class)->middleware('throttle:120,1')->name('webhooks.feexpay');
 
 // Newsletter

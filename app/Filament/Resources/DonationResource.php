@@ -55,7 +55,7 @@ class DonationResource extends Resource
                 Tables\Columns\TextColumn::make('reference')->label('Référence')->searchable()->weight('bold'),
                 Tables\Columns\TextColumn::make('prenom')
                     ->label('Donateur')
-                    ->formatStateUsing(fn($state, $r) => $state.' '.$r->nom)
+                    ->formatStateUsing(fn($state, Donation $r) => $state.' '.$r->nom)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('montant')->label('Montant')->money('XOF')->sortable(),
                 Tables\Columns\TextColumn::make('frequence')->label('Fréquence')->badge(),
@@ -66,8 +66,8 @@ class DonationResource extends Resource
                 Tables\Columns\BadgeColumn::make('status')
                     ->label('Statut')
                     ->colors(['warning' => 'pending', 'success' => 'completed', 'danger' => 'failed'])
-                    ->formatStateUsing(fn($s) => match($s) {
-                        'pending' => 'En attente', 'completed' => 'Confirmé', 'failed' => 'Échoué', default => $s
+                    ->formatStateUsing(fn($state) => match($state) {
+                        'pending' => 'En attente', 'completed' => 'Confirmé', 'failed' => 'Échoué', default => $state
                     }),
                 Tables\Columns\TextColumn::make('created_at')->label('Date')->dateTime('d/m/Y')->sortable(),
             ])

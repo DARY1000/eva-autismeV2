@@ -39,7 +39,11 @@ class ProjectResource extends Resource
                 Forms\Components\DatePicker::make('start_date')->label('Date de début'),
                 Forms\Components\DatePicker::make('end_date')->label('Date de fin'),
                 Forms\Components\TextInput::make('order')->label('Ordre')->numeric()->default(0),
-                Forms\Components\FileUpload::make('image')->label('Image')->image()->directory('projects'),
+                Forms\Components\FileUpload::make('image')->label('Image')->image()->disk('public')->directory('projects'),
+                Forms\Components\TextInput::make('link')
+                    ->label('Page « En savoir plus »')
+                    ->helperText('Adresse d\'une page du site, par exemple /nos-actions/formation.')
+                    ->rule('regex:/^\/[a-z0-9\/-]*$/'),
             ])->columns(2),
         ]);
     }
@@ -48,14 +52,14 @@ class ProjectResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\ImageColumn::make('image')->label('')->width(80)->height(50),
+                Tables\Columns\ImageColumn::make('image')->label('')->disk('public')->width(80)->height(50),
                 Tables\Columns\TextColumn::make('title')->label('Titre')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('category')->label('Catégorie')->badge(),
                 Tables\Columns\BadgeColumn::make('status')
                     ->label('Statut')
                     ->colors(['success' => 'active', 'secondary' => 'completed', 'warning' => 'upcoming'])
-                    ->formatStateUsing(fn($s) => match($s) {
-                        'active' => 'En cours', 'completed' => 'Terminé', 'upcoming' => 'À venir', default => $s
+                    ->formatStateUsing(fn($state) => match($state) {
+                        'active' => 'En cours', 'completed' => 'Terminé', 'upcoming' => 'À venir', default => $state
                     }),
                 Tables\Columns\TextColumn::make('order')->label('Ordre')->sortable(),
             ])

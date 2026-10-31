@@ -90,6 +90,7 @@
                 <ul class="dropdown">
                     <li><a href="{{ route('actions.activites') }}">Nos Activités</a></li>
                     <li><a href="{{ route('actions.projets') }}">Nos Projets</a></li>
+                    <li><a href="{{ route('actions.centre') }}">Le Centre EVA</a></li>
                     <li><a href="{{ route('actions.realisations') }}">Nos Réalisations</a></li>
                     <li><a href="{{ route('actions.formation') }}">Formation</a></li>
                     <li><a href="{{ route('actions.evenements') }}">Nos Événements</a></li>
@@ -106,6 +107,13 @@
                     <li><a href="{{ route('resources.publications') }}">Nos Publications</a></li>
                     <li><a href="{{ route('resources.medias') }}">Médias</a></li>
                 </ul>
+            </li>
+
+            <li class="nav-item">
+                <a href="{{ route('boutique.index') }}" class="nav-link {{ request()->is('boutique*') ? 'active' : '' }}">
+                    Boutique
+                    @if($cartCount = array_sum(session('cart', [])))<span class="nav-cart-count" aria-label="{{ $cartCount }} article(s) dans le panier">{{ $cartCount }}</span>@endif
+                </a>
             </li>
 
             <li class="nav-item">
@@ -217,11 +225,13 @@
                 <h5>Nos Actions</h5>
                 <ul class="footer-links">
                     <li><a href="{{ route('actions.activites') }}">Nos Activités</a></li>
+                    <li><a href="{{ route('actions.centre') }}">Le Centre EVA</a></li>
                     <li><a href="{{ route('actions.formation') }}">Formation</a></li>
                     <li><a href="{{ route('actions.realisations') }}">Nos Réalisations</a></li>
                     <li><a href="{{ route('actions.club-parents') }}">Club Parents</a></li>
                     <li><a href="{{ route('about.demarche') }}">Notre Démarche</a></li>
                     <li><a href="{{ route('about.impact') }}">Notre Impact</a></li>
+                    <li><a href="{{ route('boutique.index') }}">Boutique</a></li>
                     <li><a href="{{ route('don') }}">Faire un Don</a></li>
                 </ul>
             </div>

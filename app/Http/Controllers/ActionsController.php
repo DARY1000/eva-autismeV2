@@ -9,6 +9,7 @@ use App\Models\Contact;
 use App\Models\Formation;
 use App\Models\Project;
 use App\Models\Media;
+use App\Support\CentreEva;
 use Illuminate\Http\Request;
 
 class ActionsController extends Controller
@@ -17,6 +18,16 @@ class ActionsController extends Controller
     {
         $projects = Project::orderBy('order')->get();
         return view('pages.actions.projets', compact('projects'));
+    }
+
+    public function centre()
+    {
+        return view('pages.actions.centre', [
+            'zones'      => CentreEva::ZONES,
+            'principles' => CentreEva::DESIGN_PRINCIPLES,
+            'alignment'  => CentreEva::ALIGNMENT,
+            'sources'    => CentreEva::SOURCES,
+        ]);
     }
 
     public function activites(Request $request)

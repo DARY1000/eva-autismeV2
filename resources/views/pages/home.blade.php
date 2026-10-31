@@ -445,21 +445,21 @@
 </section>
 
 <!-- ===================== CTA SOUTIEN ===================== -->
-<section style="background:#6bc0e7;padding:80px 0;">
+<section class="band" style="padding:80px 0;">
     <div class="container" style="text-align:center;">
         <div class="reveal">
-            <span style="display:inline-block;background:rgba(0,55,105,0.12);color:#0d3d6b;font-size:0.75rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:4px 16px;border-radius:30px;margin-bottom:1rem;border:1px solid rgba(0,55,105,0.2);">Rejoignez le mouvement</span>
-            <h2 style="color:#0d3d6b;margin-bottom:1rem;font-size:clamp(1.7rem,3vw,2.4rem);">Ensemble, agissons pour l'inclusion de l'autisme au Bénin</h2>
-            <p style="color:#1a4a6e;max-width:600px;margin:0 auto 2rem;font-size:1.05rem;">Votre soutien, qu'il soit financier, bénévole ou en nature, nous permet de continuer à œuvrer pour les droits et l'inclusion des enfants autistes.</p>
+            <span style="display:inline-block;background:rgba(255,255,255,0.15);color:#fff;font-size:0.75rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:4px 16px;border-radius:30px;margin-bottom:1rem;border:1px solid rgba(0,55,105,0.2);">Rejoignez le mouvement</span>
+            <h2 style="color:#fff;margin-bottom:1rem;font-size:clamp(1.7rem,3vw,2.4rem);">Ensemble, agissons pour l'inclusion de l'autisme au Bénin</h2>
+            <p style="color:rgba(255,255,255,0.88);max-width:600px;margin:0 auto 2rem;font-size:1.05rem;">Votre soutien, qu'il soit financier, bénévole ou en nature, nous permet de continuer à œuvrer pour les droits et l'inclusion des enfants autistes.</p>
             <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
-                <a href="{{ route('don') }}" class="btn btn-lg" style="background:var(--primary);color:#fff;font-size:1rem;padding:1rem 2.5rem;border-radius:30px;box-shadow:0 4px 15px rgba(0,55,165,0.3);">
+                <a href="{{ route('don') }}" class="btn btn-lg" style="background:#fff;color:var(--primary);font-size:1rem;padding:1rem 2.5rem;border-radius:30px;box-shadow:0 4px 15px rgba(0,55,165,0.3);">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
                     Faire un Don
                 </a>
                 <a href="{{ route('contact') }}" class="btn" style="background:#f2b244;color:#5a3800;border:2px solid #f2b244;font-size:1rem;padding:1rem 2.5rem;border-radius:30px;font-weight:700;">
                     Devenir Bénévole
                 </a>
-                <a href="{{ route('contact') }}" class="btn" style="background:rgba(0,55,105,0.1);color:#0d3d6b;border:2px solid rgba(0,55,105,0.3);font-size:1rem;padding:1rem 2.5rem;border-radius:30px;">
+                <a href="{{ route('contact') }}" class="btn" style="background:rgba(255,255,255,0.1);color:#fff;border:2px solid rgba(255,255,255,0.45);font-size:1rem;padding:1rem 2.5rem;border-radius:30px;">
                     Devenir Partenaire
                 </a>
             </div>

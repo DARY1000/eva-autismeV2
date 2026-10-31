@@ -41,7 +41,7 @@ class AdminPanelProvider extends PanelProvider
             ->brandName('EVA Autisme Admin')
             ->brandLogo(asset('images/logo-eva.png'))
             ->brandLogoHeight('40px')
-            ->favicon(asset('favicon.ico'))
+            ->favicon(asset('images/favicon.png'))
             ->darkMode(false)
             ->sidebarWidth('15.5rem')
             ->maxContentWidth(MaxWidth::Full)

@@ -5,7 +5,7 @@
 @section('content')
 
 <!-- ===================== PAGE HEADER ===================== -->
-<div class="page-header" style="background:linear-gradient(135deg,var(--primary-dark) 0%,var(--primary) 100%);padding:80px 0 60px;">
+<div class="page-header" style="padding:80px 0 60px;">
     <div class="container" style="text-align:center;">
         <span class="label" style="color:rgba(255,255,255,0.8);">Informations légales</span>
         <h1 style="color:#fff;font-size:clamp(2rem,4vw,3rem);margin-top:0.5rem;">Mentions Légales</h1>

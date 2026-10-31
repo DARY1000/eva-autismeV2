@@ -5,7 +5,7 @@
 
 @section('styles')
 <style>
-.activity-head { background:linear-gradient(135deg,var(--primary) 0%,#0073e6 100%);padding:4rem 0 3rem;color:#fff; }
+.activity-head { padding:4rem 0 3rem;color:#fff; }
 .activity-head h1 { color:#fff;font-size:2.1rem;margin:0.6rem 0 1rem; }
 .activity-head a { color:rgba(255,255,255,0.85);font-size:0.88rem; }
 .activity-head-tag { display:inline-block;background:rgba(255,255,255,0.15);font-size:0.75rem;font-weight:700;padding:3px 12px;border-radius:30px; }
@@ -25,7 +25,7 @@
 @endsection
 
 @section('content')
-<section class="activity-head">
+<section class="activity-head band">
     <div class="container-sm">
         <a href="{{ route('actions.activites') }}">← Toutes nos activités</a><br><br>
         <span class="activity-head-tag">{{ $activity->category_label }} · {{ $activity->year }}</span>

@@ -5,7 +5,7 @@
 
 @section('styles')
 <style>
-.activity-hero { background:linear-gradient(135deg,var(--primary) 0%,#0073e6 100%);padding:5rem 0 4rem;color:#fff;text-align:center; }
+.activity-hero { padding:5rem 0 4rem;color:#fff;text-align:center; }
 .activity-hero h1 { color:#fff;margin-bottom:1rem; }
 .activity-hero p { color:rgba(255,255,255,0.88);font-size:1.1rem;max-width:620px;margin:0 auto; }
 .activity-filters { display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.75rem; }
@@ -26,7 +26,7 @@
 @endsection
 
 @section('content')
-<section class="activity-hero">
+<section class="activity-hero band">
     <div class="container">
         <h1>Nos Activités</h1>
         <p>Tout ce que l'ONG EVA Autisme a organisé ou rejoint, année après année, au service des personnes autistes et de leurs familles.</p>

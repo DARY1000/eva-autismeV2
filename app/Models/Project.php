@@ -18,6 +18,7 @@ class Project extends Model
         'category',
         'status',
         'image',
+        'link',
         'start_date',
         'end_date',
         'order',

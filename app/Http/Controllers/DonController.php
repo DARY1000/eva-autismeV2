@@ -36,7 +36,6 @@ class DonController extends Controller
 
         $country = $validated['pays'];
         $method  = FeexPay::isConfigured() ? ($validated['payment_method'] ?? null) : null;
-        $phone   = FeexPay::normalizePhone($validated['telephone'], $country);
 
         if (FeexPay::isConfigured() && ! $method) {
             throw ValidationException::withMessages(['payment_method' => 'Choisissez votre moyen de paiement.']);
@@ -47,17 +46,7 @@ class DonController extends Controller
             throw ValidationException::withMessages(['montant' => 'Le paiement en ligne se fait en francs CFA.']);
         }
 
-        if ($method && $method !== 'card') {
-            if (FeexPay::NETWORKS[$method]['country'] !== $country) {
-                throw ValidationException::withMessages(['payment_method' => 'Ce moyen de paiement n\'est pas disponible dans ce pays.']);
-            }
-
-            if (! $phone) {
-                throw ValidationException::withMessages([
-                    'telephone' => 'Numéro invalide pour ce pays. Exemple : '.FeexPay::COUNTRIES[$country]['example'],
-                ]);
-            }
-        }
+        $phone = $method ? FeexPay::validateChoice($method, $country, $validated['telephone']) : null;
 
         $donation = Donation::create([
             'prenom'         => $validated['prenom'],
@@ -90,12 +79,10 @@ class DonController extends Controller
         ];
 
         try {
-            $payment = $method === 'card'
-                ? $feexPay->requestCardPayment($phone ?? preg_replace('/\D/', '', $donation->telephone), (int) $donation->montant, $customer, 'don:'.$donation->reference)
-                : $feexPay->requestMobilePayment($method, $phone, (int) $donation->montant, $customer, 'don:'.$donation->reference, route('don.track', $donation->reference));
+            $payment = $feexPay->startPayment($method, $phone ?? preg_replace('/\D/', '', $donation->telephone), (int) $donation->montant, $customer, 'don:'.$donation->reference, route('don.track', $donation->reference));
         } catch (RuntimeException $e) {
             Log::error('Paiement FeexPay refusé', ['don' => $donation->reference, 'error' => $e->getMessage()]);
-            $donation->update(['status' => 'failed', 'payment_failure_reason' => 'Demande refusée par FeexPay']);
+            $donation->markPaymentFailed('Demande refusée par FeexPay');
 
             return back()->withInput()->withErrors(['montant' => 'Le paiement n\'a pas pu démarrer. Vérifiez votre numéro ou réessayez dans quelques minutes.']);
         }

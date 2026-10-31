@@ -16,22 +16,22 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // Admin user
-        User::updateOrCreate(
+        // Admin user : mot de passe aléatoire, à définir avec php artisan admin:reset-password
+        User::firstOrCreate(
             ['email' => 'admin@eva-autisme.org'],
             [
                 'name'     => 'Admin EVA Autisme',
-                'password' => Hash::make('EvaAutisme2024!'),
+                'password' => Hash::make(Str::password(32)),
                 'role'     => 'admin',
             ]
         );
 
         // Éditeur
-        User::updateOrCreate(
+        User::firstOrCreate(
             ['email' => 'editeur@eva-autisme.org'],
             [
                 'name'     => 'Éditeur EVA',
-                'password' => Hash::make('EvaAutisme2024!'),
+                'password' => Hash::make(Str::password(32)),
                 'role'     => 'editor',
             ]
         );

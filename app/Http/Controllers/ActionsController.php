@@ -1,14 +1,15 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Models\Activity;
 use App\Models\Event;
 use App\Models\EventRegistration;
 use App\Models\ClubMember;
+use App\Models\Contact;
 use App\Models\Formation;
 use App\Models\Project;
 use App\Models\Media;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class ActionsController extends Controller
 {
@@ -16,6 +17,43 @@ class ActionsController extends Controller
     {
         $projects = Project::orderBy('order')->get();
         return view('pages.actions.projets', compact('projects'));
+    }
+
+    public function activites(Request $request)
+    {
+        $year     = $request->integer('annee') ?: null;
+        $category = array_key_exists((string) $request->query('categorie'), Activity::CATEGORIES)
+            ? $request->query('categorie')
+            : null;
+
+        $activitiesByYear = Activity::published()
+            ->when($year, fn ($query) => $query->whereYear('start_date', $year))
+            ->when($category, fn ($query) => $query->where('category', $category))
+            ->latestFirst()
+            ->get()
+            ->groupBy('year');
+
+        return view('pages.actions.activites.index', [
+            'activitiesByYear' => $activitiesByYear,
+            'years'            => Activity::years(publishedOnly: true),
+            'categories'       => Activity::CATEGORIES,
+            'year'             => $year,
+            'category'         => $category,
+        ]);
+    }
+
+    public function activite(Activity $activity)
+    {
+        abort_unless($activity->is_published, 404);
+
+        $related = Activity::published()
+            ->whereYear('start_date', $activity->year)
+            ->whereKeyNot($activity->id)
+            ->latestFirst()
+            ->take(5)
+            ->get();
+
+        return view('pages.actions.activites.show', compact('activity', 'related'));
     }
 
     public function realisations()
@@ -42,7 +80,15 @@ class ActionsController extends Controller
             'message'        => 'nullable|string|max:1000',
         ]);
 
-        Log::info('Formation registration', $validated);
+        Contact::create([
+            'name'         => $validated['prenom'].' '.$validated['nom'],
+            'email'        => $validated['email'],
+            'phone'        => $validated['telephone'],
+            'organization' => $validated['organisation'] ?? null,
+            'subject'      => 'Inscription formation : '.$validated['type_formation'],
+            'message'      => $validated['message'] ?: 'Demande d\'inscription à la formation.',
+            'ip_address'   => $request->ip(),
+        ]);
 
         return redirect()->route('actions.formation')
             ->with('success', 'Votre inscription a bien été reçue ! Nous vous contacterons rapidement.');
@@ -67,7 +113,7 @@ class ActionsController extends Controller
         ]);
 
         EventRegistration::create([
-            'event_id'            => $eventId,
+            'event_id'            => Event::findOrFail($eventId)->id,
             'name'                => $validated['name'],
             'email'               => $validated['email'],
             'phone'               => $validated['phone'],

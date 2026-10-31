@@ -14,6 +14,15 @@ return [
     |
     */
 
+    'feexpay' => [
+        'shop_id'        => env('FEEXPAY_SHOP_ID'),
+        'api_key'        => env('FEEXPAY_API_KEY'),
+        'mode'           => env('FEEXPAY_MODE', 'sandbox'),
+        'webhook_secret' => env('FEEXPAY_WEBHOOK_SECRET'),
+        // Le paiement par carte demande une validation KYB préalable chez FeexPay.
+        'card_enabled'   => env('FEEXPAY_CARD_ENABLED', false),
+    ],
+
     'postmark' => [
         'token' => env('POSTMARK_TOKEN'),
     ],

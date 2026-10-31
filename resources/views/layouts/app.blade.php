@@ -87,6 +87,7 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
                 </a>
                 <ul class="dropdown">
+                    <li><a href="{{ route('actions.activites') }}">Nos Activités</a></li>
                     <li><a href="{{ route('actions.projets') }}">Nos Projets</a></li>
                     <li><a href="{{ route('actions.realisations') }}">Nos Réalisations</a></li>
                     <li><a href="{{ route('actions.formation') }}">Formation</a></li>
@@ -214,6 +215,7 @@
             <div class="footer-col">
                 <h5>Nos Actions</h5>
                 <ul class="footer-links">
+                    <li><a href="{{ route('actions.activites') }}">Nos Activités</a></li>
                     <li><a href="{{ route('actions.formation') }}">Formation</a></li>
                     <li><a href="{{ route('actions.realisations') }}">Nos Réalisations</a></li>
                     <li><a href="{{ route('actions.club-parents') }}">Club Parents</a></li>
@@ -247,6 +249,7 @@
                     </p>
                     <form action="{{ route('newsletter.subscribe') }}" method="POST" style="display:flex;flex-direction:column;gap:0.5rem;">
                         @csrf
+                        <x-form-guard />
                         <input type="email" name="email" placeholder="Votre adresse email…" required
                                style="padding:0.6rem 0.9rem;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.08);color:#fff;font-size:0.82rem;font-family:inherit;outline:none;width:100%;transition:border-color 0.2s;"
                                onfocus="this.style.borderColor='#6bc0e7'" onblur="this.style.borderColor='rgba(255,255,255,0.2)'">

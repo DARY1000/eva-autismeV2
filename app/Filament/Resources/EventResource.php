@@ -112,6 +112,10 @@ class EventResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
                     ->options(['upcoming' => 'À venir', 'past' => 'Passé', 'cancelled' => 'Annulé']),
+                Tables\Filters\SelectFilter::make('year')
+                    ->label('Année')
+                    ->options(fn() => Event::pluck('date')->filter()->map(fn($d) => $d->year)->unique()->sortDesc()->mapWithKeys(fn($y) => [$y => $y])->all())
+                    ->query(fn($query, array $data) => $query->when($data['value'], fn($q, $year) => $q->whereYear('date', $year))),
             ])
             ->actions([Tables\Actions\EditAction::make(), Tables\Actions\DeleteAction::make()])
             ->defaultSort('date', 'desc');

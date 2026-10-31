@@ -457,6 +457,7 @@
             <p>Abonnez-vous à notre newsletter pour recevoir nos dernières photos, vidéos, actualités et invitations à nos événements.</p>
             <form class="newsletter-form" action="{{ route('newsletter.subscribe') }}" method="POST">
                 @csrf
+                <x-form-guard />
                 <input type="email" name="email" placeholder="Votre adresse email" required
                        style="flex:1;min-width:220px;padding:0.75rem 1.1rem;border-radius:8px;border:none;font-size:0.95rem;outline:none;font-family:inherit;">
                 <button type="submit" class="btn btn-orange">

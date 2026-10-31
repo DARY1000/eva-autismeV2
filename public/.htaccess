@@ -5,6 +5,10 @@
 
     RewriteEngine On
 
+    # Bloque les fichiers cachés et tout script dans les fichiers envoyés
+    RewriteRule (^|/)\.(?!well-known) - [F,L]
+    RewriteRule ^storage/.*\.(php|phtml|phar|pl|py|cgi|sh)$ - [F,L,NC]
+
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]

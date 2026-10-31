@@ -8,6 +8,7 @@ use App\Http\Controllers\ResourcesController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DonController;
 use App\Http\Controllers\NewsletterController;
+use App\Http\Controllers\Webhooks\FeexPayWebhookController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,20 +30,24 @@ Route::prefix('a-propos')->name('about.')->group(function () {
 
 // Nos Actions
 Route::prefix('nos-actions')->name('actions.')->group(function () {
+    Route::get('/nos-activites',        [ActionsController::class, 'activites'])->name('activites');
+    Route::get('/nos-activites/{activity}', [ActionsController::class, 'activite'])->name('activites.show');
     Route::get('/nos-projets',          [ActionsController::class, 'projets'])->name('projets');
     Route::get('/nos-realisations',     [ActionsController::class, 'realisations'])->name('realisations');
     Route::get('/formation',            [ActionsController::class, 'formation'])->name('formation');
-    Route::post('/formation/inscription',[ActionsController::class, 'registerFormation'])->name('formation.register');
+    Route::post('/formation/inscription',[ActionsController::class, 'registerFormation'])->middleware(['throttle:forms', 'form.guard'])->name('formation.register');
     Route::get('/evenements',           [ActionsController::class, 'evenements'])->name('evenements');
-    Route::post('/evenements/{id}/inscription', [ActionsController::class, 'registerEvent'])->name('evenements.register');
+    Route::post('/evenements/{id}/inscription', [ActionsController::class, 'registerEvent'])->middleware(['throttle:forms', 'form.guard'])->name('evenements.register');
     Route::get('/club-parents',         [ActionsController::class, 'clubParents'])->name('club-parents');
-    Route::post('/club-parents/adhesion',[ActionsController::class, 'joinClub'])->name('club-parents.join');
+    Route::post('/club-parents/adhesion',[ActionsController::class, 'joinClub'])->middleware(['throttle:forms', 'form.guard'])->name('club-parents.join');
 });
 
 // Raccourcis pour les routes courtes utilisés dans les vues
-Route::post('/formation/inscription',    [ActionsController::class, 'registerFormation'])->name('formation.register');
-Route::post('/evenements/{id}/inscription',[ActionsController::class, 'registerEvent'])->name('event.register');
-Route::post('/club-parents/adhesion',    [ActionsController::class, 'joinClub'])->name('club-parents.join');
+Route::middleware(['throttle:forms', 'form.guard'])->group(function () {
+    Route::post('/formation/inscription',    [ActionsController::class, 'registerFormation'])->name('formation.register');
+    Route::post('/evenements/{id}/inscription',[ActionsController::class, 'registerEvent'])->name('event.register');
+    Route::post('/club-parents/adhesion',    [ActionsController::class, 'joinClub'])->name('club-parents.join');
+});
 
 // Nos Ressources
 Route::prefix('nos-ressources')->name('resources.')->group(function () {
@@ -52,14 +57,17 @@ Route::prefix('nos-ressources')->name('resources.')->group(function () {
 
 // Contact
 Route::get('/contactez-nous',    [ContactController::class, 'index'])->name('contact');
-Route::post('/contactez-nous',   [ContactController::class, 'send'])->name('contact.send');
+Route::post('/contactez-nous',   [ContactController::class, 'send'])->middleware(['throttle:forms', 'form.guard'])->name('contact.send');
 
 // Don
 Route::get('/faire-un-don',      [DonController::class, 'index'])->name('don');
-Route::post('/faire-un-don',     [DonController::class, 'process'])->name('don.process');
+Route::post('/faire-un-don',     [DonController::class, 'process'])->middleware(['throttle:forms', 'form.guard'])->name('don.process');
+Route::get('/faire-un-don/suivi/{reference}',  [DonController::class, 'track'])->name('don.track');
+Route::get('/faire-un-don/statut/{reference}', [DonController::class, 'status'])->middleware('throttle:40,1')->name('don.status');
+Route::post('/webhooks/feexpay', FeexPayWebhookController::class)->middleware('throttle:120,1')->name('webhooks.feexpay');
 
 // Newsletter
-Route::post('/newsletter/inscription', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
+Route::post('/newsletter/inscription', [NewsletterController::class, 'subscribe'])->middleware(['throttle:newsletter', 'form.guard'])->name('newsletter.subscribe');
 
 // Pages légales
 Route::view('/mentions-legales',             'pages.mentions-legales')->name('mentions-legales');

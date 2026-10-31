@@ -18,7 +18,7 @@
 <!-- Impact des dons -->
 <section class="section-sm" style="padding:3rem 0;background:#fff;">
     <div class="container">
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;" class="reveal">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.5rem;" class="reveal">
             <div style="background:var(--primary-light);border-radius:var(--radius-lg);padding:1.75rem;text-align:center;border:1px solid rgba(0,85,165,0.15);">
                 <div style="font-size:1.8rem;font-weight:800;color:var(--primary);margin-bottom:0.4rem;">5 000 F</div>
                 <div style="font-size:0.87rem;color:var(--text-mid);">Matériel éducatif pour 1 enfant autiste pendant un mois</div>
@@ -53,6 +53,7 @@
             @endif
 
             <!-- Sélecteur de devise -->
+            @unless($onlinePayment)
             <div class="form-group">
                 <label class="form-label">Devise</label>
                 <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.25rem;" id="currency-btns">
@@ -70,6 +71,7 @@
                     </button>
                 </div>
             </div>
+            @endunless
 
             <!-- Montants suggérés -->
             <div class="form-group">
@@ -86,6 +88,7 @@
 
             <form action="{{ route('don.process') }}" method="POST" id="don-form">
                 @csrf
+                <x-form-guard />
 
                 <!-- Montant + devise -->
                 <div class="form-row">
@@ -98,7 +101,7 @@
                         <label class="form-label" for="frequence">Fréquence <span>*</span></label>
                         <select class="form-control" name="frequence" id="frequence" required>
                             <option value="ponctuel" {{ old('frequence','ponctuel')=='ponctuel'?'selected':'' }}>Don ponctuel</option>
-                            <option value="mensuel"  {{ old('frequence')=='mensuel'?'selected':'' }}>Don mensuel (récurrent)</option>
+                            <option value="mensuel"  {{ old('frequence')=='mensuel'?'selected':'' }}>Je souhaite donner chaque mois</option>
                         </select>
                     </div>
                 </div>
@@ -106,28 +109,35 @@
                 <!-- Mode de paiement -->
                 <div class="form-group">
                     <label class="form-label">Mode de paiement <span>*</span></label>
-                    <div class="form-row" style="margin-top:0.5rem;" id="payment-methods">
-                        <label class="payment-option" for="pay-mobile">
-                            <input type="radio" name="payment_method" id="pay-mobile" value="mobile_money" checked>
-                            <span class="payment-option-inner">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:24px;height:24px"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
-                                <span>
-                                    <strong>Mobile Money</strong>
-                                    <small>MTN, Moov, Orange</small>
+                    <div class="form-row" style="margin-top:0.5rem;flex-wrap:wrap;" id="payment-methods">
+                        @foreach(\App\Services\FeexPay::NETWORKS as $network => $label)
+                            <label class="payment-option" for="pay-{{ $network }}">
+                                <input type="radio" name="payment_method" id="pay-{{ $network }}" value="{{ $network }}" @checked(old('payment_method', 'mtn') === $network)>
+                                <span class="payment-option-inner">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:24px;height:24px"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                                    <span>
+                                        <strong>{{ $label }}</strong>
+                                        <small>Validation sur votre téléphone</small>
+                                    </span>
                                 </span>
-                            </span>
-                        </label>
-                        <label class="payment-option" for="pay-card">
-                            <input type="radio" name="payment_method" id="pay-card" value="carte_bancaire">
-                            <span class="payment-option-inner">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:24px;height:24px"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-                                <span>
-                                    <strong>Carte bancaire</strong>
-                                    <small>Visa, Mastercard</small>
+                            </label>
+                        @endforeach
+                        @if(config('services.feexpay.card_enabled'))
+                            <label class="payment-option" for="pay-card">
+                                <input type="radio" name="payment_method" id="pay-card" value="card" @checked(old('payment_method') === 'card')>
+                                <span class="payment-option-inner">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:24px;height:24px"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                                    <span>
+                                        <strong>Carte bancaire</strong>
+                                        <small>Visa, Mastercard</small>
+                                    </span>
                                 </span>
-                            </span>
-                        </label>
+                            </label>
+                        @endif
                     </div>
+                    @unless($onlinePayment)
+                        <small style="color:var(--text-muted);">Le paiement en ligne arrive bientôt : notre équipe vous recontactera pour finaliser votre don.</small>
+                    @endunless
                 </div>
 
                 <div class="form-row">
@@ -147,7 +157,7 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label" for="don_tel">Téléphone <span>*</span></label>
-                        <input type="tel" class="form-control" name="telephone" id="don_tel" placeholder="+229 XX XX XX XX" value="{{ old('telephone') }}" required>
+                        <input type="tel" class="form-control" name="telephone" id="don_tel" placeholder="01 XX XX XX XX" value="{{ old('telephone') }}" required>
                     </div>
                 </div>
                 <div class="form-group">

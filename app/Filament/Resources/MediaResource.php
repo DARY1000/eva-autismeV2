@@ -86,6 +86,9 @@ class MediaResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('type')
                     ->options(['photo' => 'Photo', 'video' => 'Vidéo', 'audio' => 'Audio', 'creation' => 'Création']),
+                Tables\Filters\SelectFilter::make('album')
+                    ->label('Album')
+                    ->options(fn() => Media::whereNotNull('album')->distinct()->orderBy('album')->pluck('album', 'album')->all()),
             ])
             ->actions([Tables\Actions\EditAction::make(), Tables\Actions\DeleteAction::make()])
             ->defaultSort('created_at', 'desc');

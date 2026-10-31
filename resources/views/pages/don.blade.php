@@ -20,15 +20,15 @@
     <div class="container">
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.5rem;" class="reveal">
             <div style="background:var(--primary-light);border-radius:var(--radius-lg);padding:1.75rem;text-align:center;border:1px solid rgba(0,85,165,0.15);">
-                <div style="font-size:1.8rem;font-weight:800;color:var(--primary);margin-bottom:0.4rem;">5 000 F</div>
+                <div style="font-size:1.2rem;font-weight:800;color:var(--primary);margin-bottom:0.4rem;">Don pour l'éducation</div>
                 <div style="font-size:0.87rem;color:var(--text-mid);">Matériel éducatif pour 1 enfant autiste pendant un mois</div>
             </div>
             <div style="background:#fff0eb;border-radius:var(--radius-lg);padding:1.75rem;text-align:center;border:1px solid rgba(232,80,26,0.15);">
-                <div style="font-size:1.8rem;font-weight:800;color:var(--accent);margin-bottom:0.4rem;">15 000 F</div>
+                <div style="font-size:1.2rem;font-weight:800;color:var(--accent);margin-bottom:0.4rem;">Don pour les soins</div>
                 <div style="font-size:0.87rem;color:var(--text-mid);">Financement d'une séance thérapeutique pour un enfant</div>
             </div>
             <div style="background:#e8f5e9;border-radius:var(--radius-lg);padding:1.75rem;text-align:center;border:1px solid rgba(39,174,96,0.15);">
-                <div style="font-size:1.8rem;font-weight:800;color:#27ae60;margin-bottom:0.4rem;">50 000 F</div>
+                <div style="font-size:1.2rem;font-weight:800;color:#27ae60;margin-bottom:0.4rem;">Don pour les familles</div>
                 <div style="font-size:0.87rem;color:var(--text-mid);">Accompagnement complet d'une famille pendant 1 mois</div>
             </div>
         </div>
@@ -52,140 +52,67 @@
             </div>
             @endif
 
-            <!-- Sélecteur de devise -->
-            @unless($onlinePayment)
-            <div class="form-group">
-                <label class="form-label">Devise</label>
-                <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.25rem;" id="currency-btns">
-                    <button type="button" class="currency-btn active" data-currency="XOF" data-symbol="F CFA" data-amounts="500,1000,2000,5000,10000,25000" data-placeholder="Ex: 5000" data-min="500">
-                        🇧🇯 FCFA
-                    </button>
-                    <button type="button" class="currency-btn" data-currency="EUR" data-symbol="€" data-amounts="5,10,20,50,100,200" data-placeholder="Ex: 20" data-min="1">
-                        🇪🇺 Euro (€)
-                    </button>
-                    <button type="button" class="currency-btn" data-currency="USD" data-symbol="$" data-amounts="5,10,20,50,100,200" data-placeholder="Ex: 20" data-min="1">
-                        🇺🇸 Dollar ($)
-                    </button>
-                    <button type="button" class="currency-btn" data-currency="GBP" data-symbol="£" data-amounts="5,10,20,50,100" data-placeholder="Ex: 20" data-min="1">
-                        🇬🇧 Livre (£)
-                    </button>
-                </div>
-            </div>
-            @endunless
-
-            <!-- Montants suggérés -->
-            <div class="form-group">
-                <label class="form-label" id="amounts-label">Choisissez un montant</label>
-                <div style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-bottom:1rem;" id="amount-btns">
-                    <button type="button" class="btn btn-white-light amount-btn" data-amount="500">500 F CFA</button>
-                    <button type="button" class="btn btn-white-light amount-btn" data-amount="1000">1 000 F CFA</button>
-                    <button type="button" class="btn btn-white-light amount-btn" data-amount="2000">2 000 F CFA</button>
-                    <button type="button" class="btn btn-white-light amount-btn" data-amount="5000">5 000 F CFA</button>
-                    <button type="button" class="btn btn-white-light amount-btn" data-amount="10000">10 000 F CFA</button>
-                    <button type="button" class="btn btn-white-light amount-btn" data-amount="25000">25 000 F CFA</button>
-                </div>
-            </div>
-
             <form action="{{ route('don.process') }}" method="POST" id="don-form">
                 @csrf
                 <x-form-guard />
 
-                <!-- Montant + devise -->
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label" for="montant">Montant <span>*</span> <span id="devise-label" style="color:var(--primary);font-weight:700;">(F CFA)</span></label>
-                        <input type="number" class="form-control" name="montant" id="montant" placeholder="Votre montant, ex : 1 500" min="{{ \App\Services\FeexPay::MIN_AMOUNT }}" max="{{ \App\Services\FeexPay::MAX_AMOUNT }}" step="1" value="{{ old('montant') }}" required>
-                        <small style="color:var(--text-muted);">Montant libre, à partir de 100 F CFA.</small>
-                        <input type="hidden" name="devise" id="devise-input" value="XOF">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="frequence">Fréquence <span>*</span></label>
-                        <select class="form-control" name="frequence" id="frequence" required>
-                            <option value="ponctuel" {{ old('frequence','ponctuel')=='ponctuel'?'selected':'' }}>Don ponctuel</option>
-                            <option value="mensuel"  {{ old('frequence')=='mensuel'?'selected':'' }}>Je souhaite donner chaque mois</option>
-                        </select>
-                    </div>
+                <div class="don-summary">
+                    <div><strong>Votre don</strong><small id="don-frequency-label">Don ponctuel</small></div>
+                    <output id="don-total">— F CFA</output>
                 </div>
 
-                <!-- Pays et mode de paiement -->
+                <!-- Montant -->
                 <div class="form-group">
-                    <label class="form-label" for="don_pays">Votre pays <span>*</span></label>
-                    <select class="form-control" name="pays" id="don_pays" required>
-                        @foreach(\App\Services\FeexPay::COUNTRIES as $code => $country)
-                            <option value="{{ $code }}" data-dial="{{ $country['dial'] }}" data-example="{{ $country['example'] }}" @selected(old('pays', 'BJ') === $code)>{{ $country['name'] }} (+{{ $country['dial'] }})</option>
+                    <label class="form-label" for="montant">Choisissez un montant <span>*</span></label>
+                    <div class="don-amounts">
+                        @foreach([500, 1000, 2000, 5000, 10000, 25000] as $amount)
+                            <button type="button" class="don-amount" data-amount="{{ $amount }}">{{ number_format($amount, 0, ',', ' ') }} F</button>
                         @endforeach
+                    </div>
+                    <input type="number" class="form-control" name="montant" id="montant" placeholder="Ou saisissez votre montant (dès 100 F CFA)" min="{{ \App\Services\FeexPay::MIN_AMOUNT }}" max="{{ \App\Services\FeexPay::MAX_AMOUNT }}" step="1" value="{{ old('montant') }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="frequence">Fréquence</label>
+                    <select class="form-control" name="frequence" id="frequence" required>
+                        <option value="ponctuel" @selected(old('frequence', 'ponctuel') === 'ponctuel')>Don ponctuel</option>
+                        <option value="mensuel" @selected(old('frequence') === 'mensuel')>Je souhaite donner chaque mois</option>
                     </select>
-                    <small style="color:var(--text-muted);">Vous êtes dans un autre pays ? <a href="{{ route('contact') }}">Contactez-nous</a> pour faire un don.</small>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">Mode de paiement <span>*</span></label>
-                    <div style="margin-top:0.5rem;" id="payment-methods">
-                        @foreach(\App\Services\FeexPay::availableNetworks() as $network => $option)
-                            <label class="payment-option" for="pay-{{ $network }}" data-country="{{ $option['country'] }}">
-                                <input type="radio" name="payment_method" id="pay-{{ $network }}" value="{{ $network }}" @checked(old('payment_method') === $network)>
-                                <span class="payment-option-inner">
-                                    <img src="{{ asset('images/payment/'.$option['logo'].'.png') }}" alt="" class="payment-logo is-{{ $option['logo'] }}" width="44" height="44" loading="lazy">
-                                    <span>
-                                        <strong>{{ $option['label'] }}</strong>
-                                        <small>{{ ($option['redirect'] ?? false) ? 'Paiement sur la page de l\'opérateur' : 'Validation sur votre téléphone' }}</small>
-                                    </span>
-                                </span>
-                            </label>
-                        @endforeach
-                        @if(config('services.feexpay.card_enabled'))
-                            <label class="payment-option" for="pay-card">
-                                <input type="radio" name="payment_method" id="pay-card" value="card" @checked(old('payment_method') === 'card')>
-                                <span class="payment-option-inner">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:24px;height:24px"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-                                    <span>
-                                        <strong>Carte bancaire</strong>
-                                        <small>Visa, Mastercard</small>
-                                    </span>
-                                </span>
-                            </label>
-                        @endif
-                    </div>
-                    @unless($onlinePayment)
-                        <small style="color:var(--text-muted);">Le paiement en ligne arrive bientôt : notre équipe vous recontactera pour finaliser votre don.</small>
-                    @endunless
-                </div>
+                <!-- Paiement -->
+                <x-payment-fields />
 
+                @unless($onlinePayment)
+                    <p style="font-size:0.85rem;color:var(--text-muted);">Le paiement en ligne arrive bientôt : notre équipe vous recontactera pour finaliser votre don.</p>
+                @endunless
+
+                <!-- Donateur -->
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label" for="don_prenom">Prénom <span>*</span></label>
-                        <input type="text" class="form-control" name="prenom" id="don_prenom" placeholder="Votre prénom" value="{{ old('prenom') }}" required>
+                        <input type="text" class="form-control" name="prenom" id="don_prenom" placeholder="Votre prénom" autocomplete="given-name" value="{{ old('prenom') }}" required>
                     </div>
                     <div class="form-group">
                         <label class="form-label" for="don_nom">Nom <span>*</span></label>
-                        <input type="text" class="form-control" name="nom" id="don_nom" placeholder="Votre nom" value="{{ old('nom') }}" required>
+                        <input type="text" class="form-control" name="nom" id="don_nom" placeholder="Votre nom" autocomplete="family-name" value="{{ old('nom') }}" required>
                     </div>
                 </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label" for="don_email">Email <span>*</span></label>
-                        <input type="email" class="form-control" name="email" id="don_email" placeholder="votre@email.com" value="{{ old('email') }}" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="don_tel">Téléphone <span>*</span> <span id="don_dial" style="color:var(--primary);font-weight:700;"></span></label>
-                        <input type="tel" class="form-control" name="telephone" id="don_tel" placeholder="01 XX XX XX XX" value="{{ old('telephone') }}" required>
-                    </div>
+                <div class="form-group">
+                    <label class="form-label" for="don_email">Email <span>*</span></label>
+                    <input type="email" class="form-control" name="email" id="don_email" placeholder="votre@email.com" autocomplete="email" value="{{ old('email') }}" required>
                 </div>
                 <div class="form-group">
                     <label class="form-label" for="don_msg">Message (optionnel)</label>
                     <textarea class="form-control" name="message" id="don_msg" placeholder="Un message d'encouragement ?">{{ old('message') }}</textarea>
                 </div>
 
-                <div style="background:var(--primary-light);border-radius:var(--radius);padding:1.25rem;margin-bottom:1.5rem;border-left:4px solid var(--primary);">
-                    <p style="font-size:0.85rem;color:var(--text-mid);margin:0;">
-                        <strong style="color:var(--primary);">Paiement sécurisé via FedaPay :</strong> Après validation, vous serez redirigé vers notre interface de paiement sécurisée. Nous acceptons Mobile Money (MTN, Moov, Orange), cartes Visa et Mastercard.
-                    </p>
-                </div>
-
-                <button type="submit" class="btn btn-lg" style="width:100%;justify-content:center;background:var(--primary);color:#fff;border-radius:30px;font-size:1rem;">
+                <button type="submit" class="btn btn-lg" id="don-submit" style="width:100%;justify-content:center;background:var(--primary);color:#fff;border-radius:30px;">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-                    Procéder au paiement
+                    <span id="don-submit-label">Procéder au paiement</span>
                 </button>
+                <p style="font-size:0.8rem;color:var(--text-muted);text-align:center;margin:0.85rem 0 0;">Paiement sécurisé par FeexPay. Vous validez le montant sur votre téléphone ou sur la page de votre opérateur.</p>
+                <p style="font-size:0.8rem;color:var(--text-muted);text-align:center;margin:0.25rem 0 0;">Vous êtes dans un autre pays ? <a href="{{ route('contact') }}">Contactez-nous</a> pour faire un don.</p>
             </form>
         </div>
     </div>
@@ -313,82 +240,31 @@
 
 @section('scripts')
 <script>
-// Pays : affiche ses réseaux et adapte le numéro attendu
 (function () {
-    const select = document.getElementById('don_pays');
-    const update = () => {
-        const options = [...document.querySelectorAll('#payment-methods [data-country]')];
-        options.forEach(option => {
-            const available = option.dataset.country === select.value;
-            option.hidden = !available;
-            if (!available) option.querySelector('input').checked = false;
-        });
-        const visible = options.filter(option => !option.hidden);
-        if (!visible.some(option => option.querySelector('input').checked) && visible.length) {
-            visible[0].querySelector('input').checked = true;
-        }
-        const country = select.selectedOptions[0];
-        document.getElementById('don_dial').textContent = '(+' + country.dataset.dial + ')';
-        document.getElementById('don_tel').placeholder = country.dataset.example;
+    const input   = document.getElementById('montant');
+    const total   = document.getElementById('don-total');
+    const submit  = document.getElementById('don-submit-label');
+    const buttons = document.querySelectorAll('.don-amount');
+    const frequency = document.getElementById('frequence');
+
+    const format = value => Number(value).toLocaleString('fr-FR').replace(/\u202f|\u00a0/g, ' ');
+
+    const refresh = () => {
+        const amount = Number(input.value);
+        const valid  = amount >= Number(input.min);
+        total.textContent  = valid ? format(amount) + ' F CFA' : '— F CFA';
+        submit.textContent = valid ? 'Donner ' + format(amount) + ' F CFA' : 'Procéder au paiement';
+        buttons.forEach(button => button.classList.toggle('is-active', button.dataset.amount === input.value));
+        document.getElementById('don-frequency-label').textContent = frequency.selectedOptions[0].textContent;
     };
-    select.addEventListener('change', update);
-    update();
+
+    buttons.forEach(button => button.addEventListener('click', () => {
+        input.value = button.dataset.amount;
+        refresh();
+    }));
+    input.addEventListener('input', refresh);
+    frequency.addEventListener('change', refresh);
+    refresh();
 })();
-
-// Amount buttons
-document.querySelectorAll('.amount-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        document.querySelectorAll('.amount-btn').forEach(b => {
-            b.classList.remove('btn-blue'); b.classList.add('btn-white-light');
-        });
-        btn.classList.add('btn-blue'); btn.classList.remove('btn-white-light');
-        document.getElementById('montant').value = btn.dataset.amount;
-    });
-});
-
-document.getElementById('montant').addEventListener('input', () => {
-    document.querySelectorAll('.amount-btn').forEach(b => {
-        b.classList.remove('btn-blue'); b.classList.add('btn-white-light');
-    });
-});
-
-// Currency selector
-document.querySelectorAll('.currency-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        document.querySelectorAll('.currency-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-
-        const symbol   = btn.dataset.symbol;
-        const amounts  = btn.dataset.amounts.split(',');
-        const currency = btn.dataset.currency;
-        const placeholder = btn.dataset.placeholder;
-        const min = btn.dataset.min;
-
-        // Update hidden currency field
-        document.getElementById('devise-input').value = currency;
-        document.getElementById('devise-label').textContent = '(' + symbol + ')';
-        document.getElementById('montant').placeholder = placeholder;
-        document.getElementById('montant').min = min;
-        document.getElementById('montant').value = '';
-
-        // Rebuild amount buttons
-        const container = document.getElementById('amount-btns');
-        container.innerHTML = '';
-        amounts.forEach(amt => {
-            const b = document.createElement('button');
-            b.type = 'button';
-            b.className = 'btn btn-white-light amount-btn';
-            b.dataset.amount = amt;
-            const num = parseFloat(amt);
-            b.textContent = num.toLocaleString('fr-FR') + ' ' + symbol;
-            b.addEventListener('click', () => {
-                container.querySelectorAll('.amount-btn').forEach(x => { x.classList.remove('btn-blue'); x.classList.add('btn-white-light'); });
-                b.classList.add('btn-blue'); b.classList.remove('btn-white-light');
-                document.getElementById('montant').value = amt;
-            });
-            container.appendChild(b);
-        });
-    });
-});
 </script>
 @endsection

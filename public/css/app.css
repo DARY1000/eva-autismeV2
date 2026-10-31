@@ -1516,11 +1516,6 @@ select.form-control { cursor: pointer; }
 .currency-btn.active { border-color: var(--primary); background: var(--primary); color: #fff; }
 
 .payment-option { cursor: pointer; }
-.payment-option[hidden] { display: none; }
-#payment-methods { display: grid; grid-template-columns: repeat(auto-fill, minmax(215px, 1fr)); gap: 0.6rem; }
-.payment-logo { width: 48px; height: 48px; flex-shrink: 0; object-fit: contain; border-radius: 8px; background: #fff; }
-.payment-logo.is-moov { object-position: left center; transform: scale(1.25); }
-.payment-logo.is-mtn { background: #ffcb05; padding: 5px; }
 .payment-option input[type=radio] { display: none; }
 .payment-option-inner {
     display: flex; align-items: center; gap: 0.75rem;
@@ -1837,4 +1832,44 @@ select.form-control { cursor: pointer; }
 @media (max-width: 480px) {
     .whatsapp-float { bottom: 1.25rem; right: 1.25rem; width: 50px; height: 50px; }
     .whatsapp-float svg { width: 26px; height: 26px; }
+}
+
+/* ===== Paiement (dons et boutique) ===== */
+.don-summary { display: flex; justify-content: space-between; align-items: center; gap: 1rem; background: var(--primary-light); border-radius: var(--radius-lg); padding: 1.1rem 1.4rem; margin-bottom: 1.5rem; }
+.don-summary strong { display: block; color: var(--primary); }
+.don-summary small { font-size: 0.8rem; color: var(--primary); }
+.don-summary output { font-size: 1.45rem; font-weight: 800; color: var(--primary-dark); white-space: nowrap; }
+.don-amounts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.6rem; margin-bottom: 0.75rem; }
+.don-amount { padding: 0.7rem 0.4rem; border: 1.5px solid var(--border); border-radius: var(--radius); background: #fff; font-weight: 700; font-size: 0.92rem; color: var(--text-dark); cursor: pointer; transition: border-color 0.15s, background 0.15s; }
+.don-amount:hover { border-color: var(--primary); }
+.don-amount.is-active { border-color: var(--primary); background: var(--primary); color: #fff; }
+
+.pay { counter-reset: pay-step; margin-bottom: 1.5rem; }
+.pay-tabs { display: grid; grid-template-columns: 1fr 1fr; border: 1.5px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 1.5rem; }
+.pay-tab { display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.85rem 0.5rem; border: 0; background: #fff; font-weight: 700; font-size: 0.92rem; color: var(--text-mid); cursor: pointer; }
+.pay-tab svg { width: 18px; height: 18px; flex: none; }
+.pay-tab small { font-weight: 400; font-size: 0.75rem; }
+.pay-tab[aria-selected="true"] { background: var(--primary); color: #fff; }
+.pay-tab:disabled { color: #aab2bd; cursor: not-allowed; }
+.pay-step { border: 0; padding: 0; margin: 0 0 1.35rem; min-width: 0; counter-increment: pay-step; }
+.pay-step[hidden] { display: none; }
+.pay-step-title { display: flex; align-items: center; gap: 0.55rem; padding: 0; margin-bottom: 0.6rem; font-weight: 700; font-size: 0.95rem; color: var(--text-dark); }
+.pay-step-title::before { content: counter(pay-step); display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: var(--primary); color: #fff; font-size: 0.78rem; }
+.pay-operators { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.6rem; }
+.pay-operator { position: relative; cursor: pointer; }
+.pay-operator[hidden] { display: none; }
+.pay-operator input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+.pay-operator-tile { display: flex; flex-direction: column; align-items: center; gap: 0.45rem; height: 100%; padding: 0.9rem 0.4rem 0.7rem; background: #f7f8fa; border: 2px solid transparent; border-radius: 14px; transition: border-color 0.15s, background 0.15s; }
+.pay-operator-tile img { width: 58px; height: 58px; object-fit: contain; border-radius: 8px; }
+.pay-operator-tile span { font-size: 0.74rem; font-weight: 600; color: var(--text-mid); text-align: center; line-height: 1.2; }
+.pay-operator input:checked + .pay-operator-tile { background: var(--primary-light); border-color: var(--primary); }
+.pay-operator input:focus-visible + .pay-operator-tile { outline: 2px solid var(--primary); outline-offset: 2px; }
+.pay-redirect-note { display: block; margin-top: 0.5rem; font-size: 0.8rem; color: var(--text-muted); }
+.pay-redirect-note[hidden] { display: none; }
+.pay-phone { display: flex; align-items: stretch; }
+.pay-phone span { display: flex; align-items: center; padding: 0 0.9rem; background: var(--primary-light); border: 1px solid var(--border); border-right: 0; border-radius: var(--radius) 0 0 var(--radius); font-weight: 700; color: var(--primary); }
+.pay-phone input { flex: 1; min-width: 0; border-radius: 0 var(--radius) var(--radius) 0; }
+@media (max-width: 480px) {
+    .pay-tab { flex-wrap: wrap; gap: 0.3rem; font-size: 0.82rem; }
+    .pay-tab small { width: 100%; }
 }

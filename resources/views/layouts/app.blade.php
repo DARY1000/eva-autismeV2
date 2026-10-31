@@ -90,7 +90,7 @@
                 <ul class="dropdown">
                     <li><a href="{{ route('actions.activites') }}">Nos Activités</a></li>
                     <li><a href="{{ route('actions.projets') }}">Nos Projets</a></li>
-                    <li><a href="{{ route('actions.centre') }}">Le Centre EVA <span class="nav-badge">À venir</span></a></li>
+                    <li><a href="{{ route('actions.centre') }}">Le Centre NESA <span class="nav-badge">À venir</span></a></li>
                     <li><a href="{{ route('actions.realisations') }}">Nos Réalisations</a></li>
                     <li><a href="{{ route('actions.formation') }}">Formation</a></li>
                     <li><a href="{{ route('actions.evenements') }}">Nos Événements</a></li>
@@ -225,7 +225,7 @@
                 <h5>Nos Actions</h5>
                 <ul class="footer-links">
                     <li><a href="{{ route('actions.activites') }}">Nos Activités</a></li>
-                    <li><a href="{{ route('actions.centre') }}">Le Centre EVA</a></li>
+                    <li><a href="{{ route('actions.centre') }}">Le Centre NESA</a></li>
                     <li><a href="{{ route('actions.formation') }}">Formation</a></li>
                     <li><a href="{{ route('actions.realisations') }}">Nos Réalisations</a></li>
                     <li><a href="{{ route('actions.club-parents') }}">Club Parents</a></li>

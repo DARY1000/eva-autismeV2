@@ -15,12 +15,12 @@ class FeexPay
 {
     /** pattern : numéro complet attendu par FeexPay ; length : chiffres du numéro local. */
     public const COUNTRIES = [
-        'BJ' => ['name' => 'Bénin', 'dial' => '229', 'length' => 10, 'pattern' => '/^22901\d{8}$/', 'example' => '01 97 00 00 00'],
-        'TG' => ['name' => 'Togo', 'dial' => '228', 'length' => 8, 'pattern' => '/^228\d{8}$/', 'example' => '90 00 00 00'],
-        'CI' => ['name' => 'Côte d\'Ivoire', 'dial' => '225', 'length' => 10, 'pattern' => '/^225\d{10}$/', 'example' => '05 07 70 00 00'],
-        'SN' => ['name' => 'Sénégal', 'dial' => '221', 'length' => 9, 'pattern' => '/^221\d{9}$/', 'example' => '77 000 00 00'],
-        'BF' => ['name' => 'Burkina Faso', 'dial' => '226', 'length' => 8, 'pattern' => '/^226\d{8}$/', 'example' => '70 00 00 00'],
-        'CG' => ['name' => 'Congo-Brazzaville', 'dial' => '242', 'length' => 9, 'pattern' => '/^242\d{9}$/', 'example' => '06 100 0000'],
+        'BJ' => ['flag' => '🇧🇯', 'name' => 'Bénin', 'dial' => '229', 'length' => 10, 'pattern' => '/^22901\d{8}$/', 'example' => '01 97 00 00 00'],
+        'TG' => ['flag' => '🇹🇬', 'name' => 'Togo', 'dial' => '228', 'length' => 8, 'pattern' => '/^228\d{8}$/', 'example' => '90 00 00 00'],
+        'CI' => ['flag' => '🇨🇮', 'name' => 'Côte d\'Ivoire', 'dial' => '225', 'length' => 10, 'pattern' => '/^225\d{10}$/', 'example' => '05 07 70 00 00'],
+        'SN' => ['flag' => '🇸🇳', 'name' => 'Sénégal', 'dial' => '221', 'length' => 9, 'pattern' => '/^221\d{9}$/', 'example' => '77 000 00 00'],
+        'BF' => ['flag' => '🇧🇫', 'name' => 'Burkina Faso', 'dial' => '226', 'length' => 8, 'pattern' => '/^226\d{8}$/', 'example' => '70 00 00 00'],
+        'CG' => ['flag' => '🇨🇬', 'name' => 'Congo-Brazzaville', 'dial' => '242', 'length' => 9, 'pattern' => '/^242\d{9}$/', 'example' => '06 100 0000'],
     ];
 
     /**
@@ -31,7 +31,7 @@ class FeexPay
         'mtn'        => ['label' => 'MTN Mobile Money', 'country' => 'BJ', 'logo' => 'mtn'],
         'moov'       => ['label' => 'Moov Money', 'country' => 'BJ', 'logo' => 'moov'],
         'celtiis_bj' => ['label' => 'Celtiis Cash', 'country' => 'BJ', 'logo' => 'celtiis'],
-        'togocom_tg' => ['label' => 'T-Money', 'country' => 'TG', 'logo' => 'mixx'],
+        'togocom_tg' => ['label' => 'T-Money', 'country' => 'TG', 'logo' => 'togocom'],
         'moov_tg'    => ['label' => 'Flooz', 'country' => 'TG', 'logo' => 'flooz'],
         'mtn_ci'     => ['label' => 'MTN Mobile Money', 'country' => 'CI', 'logo' => 'mtn'],
         'moov_ci'    => ['label' => 'Moov Money', 'country' => 'CI', 'logo' => 'moov', 'redirect' => true],

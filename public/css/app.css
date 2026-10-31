@@ -1952,6 +1952,7 @@ select.form-control { cursor: pointer; }
 /* ============================================================
    BOUTIQUE
    ============================================================ */
+.nav-badge { flex: none; margin-left: 6px; padding: 2px 8px; border-radius: 20px; background: var(--accent); color: #fff; font-size: 0.68rem; font-weight: 700; line-height: 1.4; white-space: nowrap; }
 .nav-cart-count { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--accent); color: #fff; font-size: 0.68rem; font-weight: 700; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
 .shop-title { margin-bottom: 1.5rem; font-size: 1.8rem; }

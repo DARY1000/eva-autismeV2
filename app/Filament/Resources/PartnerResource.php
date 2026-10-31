@@ -72,8 +72,7 @@ class PartnerResource extends Resource
                 Tables\Columns\ImageColumn::make('logo')
                     ->label('')
                     ->width(80)
-                    ->height(45)
-                    ->fit('contain'),
+                    ->height(45),
                 Tables\Columns\TextColumn::make('name')
                     ->label('Nom')
                     ->searchable()

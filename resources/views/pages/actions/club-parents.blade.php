@@ -339,6 +339,7 @@
                 <div class="card-body" style="padding:2.5rem;">
                     <form action="{{ route('club-parents.join') }}" method="POST" novalidate>
                         @csrf
+                        <x-form-guard />
 
                         <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;">
                             <div class="form-group">

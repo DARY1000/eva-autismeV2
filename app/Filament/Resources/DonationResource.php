@@ -4,8 +4,10 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\DonationResource\Pages;
 use App\Models\Donation;
+use App\Services\FeexPay;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -37,6 +39,10 @@ class DonationResource extends Resource
                     ->label('Statut')
                     ->options(['pending' => 'En attente', 'completed' => 'Confirmé', 'failed' => 'Échoué'])
                     ->required(),
+                Forms\Components\TextInput::make('payment_method')->label('Moyen de paiement')->disabled(),
+                Forms\Components\TextInput::make('payment_reference')->label('Référence FeexPay')->disabled(),
+                Forms\Components\DateTimePicker::make('paid_at')->label('Payé le')->disabled(),
+                Forms\Components\TextInput::make('payment_failure_reason')->label('Motif de l\'échec')->disabled(),
                 Forms\Components\Textarea::make('message')->label('Message du donateur')->disabled()->columnSpanFull(),
             ])->columns(2),
         ]);
@@ -53,6 +59,10 @@ class DonationResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('montant')->label('Montant')->money('XOF')->sortable(),
                 Tables\Columns\TextColumn::make('frequence')->label('Fréquence')->badge(),
+                Tables\Columns\TextColumn::make('payment_method')
+                    ->label('Paiement')
+                    ->formatStateUsing(fn($state) => FeexPay::NETWORKS[$state] ?? ($state === 'card' ? 'Carte bancaire' : $state))
+                    ->placeholder('Hors ligne'),
                 Tables\Columns\BadgeColumn::make('status')
                     ->label('Statut')
                     ->colors(['warning' => 'pending', 'success' => 'completed', 'danger' => 'failed'])
@@ -67,7 +77,22 @@ class DonationResource extends Resource
                 Tables\Filters\SelectFilter::make('frequence')
                     ->options(['ponctuel' => 'Ponctuel', 'mensuel' => 'Mensuel']),
             ])
-            ->actions([Tables\Actions\EditAction::make(), Tables\Actions\DeleteAction::make()])
+            ->actions([
+                Tables\Actions\Action::make('verify')
+                    ->label('Vérifier le paiement')
+                    ->icon('heroicon-m-arrow-path')
+                    ->visible(fn(Donation $r) => $r->status === 'pending' && filled($r->payment_reference))
+                    ->action(function (Donation $r) {
+                        try {
+                            $r->syncPayment(app(FeexPay::class));
+                            Notification::make()->title('Statut : '.$r->status)->success()->send();
+                        } catch (\RuntimeException) {
+                            Notification::make()->title('FeexPay ne répond pas, réessayez plus tard')->danger()->send();
+                        }
+                    }),
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
+            ])
             ->defaultSort('created_at', 'desc')
             ->headerActions([
                 Tables\Actions\Action::make('export')

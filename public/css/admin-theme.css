@@ -1,0 +1,88 @@
+/* Thème de l'admin EVA Autisme. Feuille simple : le déploiement ne lance pas de build CSS. */
+.fi-body { background: #eceef1; }
+
+@media (min-width: 1024px) {
+    .fi-topbar { display: none; }
+    .fi-main-ctn {
+        background: #fff;
+        border-radius: 22px;
+        margin: 10px 10px 10px 0;
+        min-height: calc(100vh - 20px);
+        box-shadow: 0 1px 2px rgba(15, 23, 42, .04);
+    }
+    .fi-sidebar-header { background: transparent; box-shadow: none; --tw-ring-shadow: 0 0 #0000; height: 76px; padding-inline: 22px; }
+}
+
+/* Barre latérale */
+.fi-sidebar-header .fi-logo { mix-blend-mode: multiply; }
+.fi-sidebar-nav { padding: 6px 12px 12px; row-gap: 14px; }
+.fi-sidebar-nav-groups { row-gap: 14px; margin-inline: 0; }
+.fi-sidebar-group { row-gap: 2px; }
+.fi-sidebar-group-label { font-size: 11px; font-weight: 600; color: #9aa1ad; letter-spacing: .02em; }
+.fi-sidebar-group-button { padding-block: 4px; }
+.fi-sidebar-group-items { row-gap: 2px; }
+.fi-sidebar-item-button { padding: 8px 10px; border-radius: 10px; }
+.fi-sidebar-item-label { font-size: 13.5px; font-weight: 500; color: #3f4754; }
+.fi-sidebar-item-icon { width: 18px; height: 18px; color: #6b7280; }
+.fi-sidebar-item-button:hover { background: rgba(255, 255, 255, .6); }
+.fi-sidebar-item-active .fi-sidebar-item-button { background: #fff; box-shadow: 0 1px 3px rgba(15, 23, 42, .1); }
+.fi-sidebar-item-active .fi-sidebar-item-label { color: #0f172a; font-weight: 600; }
+.fi-sidebar-item-active .fi-sidebar-item-icon { color: #0055a5; }
+
+.eva-sidebar-user { display: flex; align-items: center; gap: 10px; padding: 12px 18px 16px; border-top: 1px solid #dfe2e7; margin: 0 8px; }
+.eva-sidebar-user > div { min-width: 0; flex: 1; line-height: 1.2; }
+.eva-sidebar-user strong { display: block; font-size: 13px; font-weight: 600; color: #1f2937; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.eva-sidebar-user small { font-size: 11.5px; color: #8a919d; }
+.eva-sidebar-user button { display: flex; padding: 6px; border-radius: 8px; color: #6b7280; }
+.eva-sidebar-user button:hover { background: #fff; color: #dc2626; }
+.eva-sidebar-user svg { width: 18px; height: 18px; }
+
+/* Tableau de bord */
+.eva-avatar { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; background: #e8f0fb; color: #0055a5; font-size: 13px; font-weight: 700; }
+.eva-dash-head { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+.eva-dash-head h1 { font-size: 20px; font-weight: 600; color: #111827; }
+.eva-dash-head p { font-size: 13.5px; color: #6b7280; margin-top: 2px; }
+.eva-dash-actions { display: flex; gap: 10px; }
+.eva-btn { padding: 8px 15px; border-radius: 10px; border: 1px solid #dfe2e7; background: #fff; font-size: 13.5px; font-weight: 500; color: #1f2937; }
+.eva-btn:hover { background: #f6f7f9; }
+.eva-btn.is-dark { background: #1f2937; border-color: #1f2937; color: #fff; }
+.eva-btn.is-dark:hover { background: #111827; }
+
+.eva-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+.eva-card { position: relative; display: flex; flex-direction: column; min-height: 286px; padding: 22px 24px; background: #fff; border: 1px solid #e7e9ee; border-radius: 18px; overflow: hidden; }
+.eva-card header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.eva-card h2 { font-size: 15.5px; font-weight: 600; color: #1f2937; }
+.eva-card header p { font-size: 12.5px; color: #7b8290; margin-top: 2px; }
+.eva-card select { padding: 5px 28px 5px 10px; font-size: 12.5px; color: #374151; background-color: #fff; border: 1px solid #e2e5ea; border-radius: 9px; }
+.eva-figure { margin-top: 16px; font-size: 30px; font-weight: 600; letter-spacing: -.02em; color: #1f2937; line-height: 1.1; }
+.eva-delta { font-size: 12px; font-weight: 600; letter-spacing: 0; vertical-align: 6px; }
+.eva-delta.is-up { color: #16a34a; }
+.eva-delta.is-down { color: #dc2626; }
+
+.eva-progress { margin-top: 20px; display: grid; gap: 13px; }
+.eva-progress li { display: grid; grid-template-columns: 80px 1fr 28px; align-items: center; gap: 12px; font-size: 12.5px; color: #4b5563; }
+.eva-progress li > span:last-child { text-align: right; }
+.eva-progress i { height: 7px; border-radius: 5px; background: #eef0f3; overflow: hidden; }
+.eva-progress b { display: block; height: 100%; border-radius: 5px; background: #34b98a; }
+
+.eva-card-chart { padding-bottom: 14px; }
+.eva-area { position: absolute; left: 0; right: 0; bottom: 34px; width: 100%; height: 118px; }
+.eva-axis { margin-top: auto; display: flex; justify-content: space-between; font-size: 11.5px; color: #7b8290; position: relative; }
+
+.eva-people { margin-top: 18px; display: grid; gap: 14px; }
+.eva-people li { display: flex; align-items: center; gap: 12px; }
+.eva-people strong { display: block; font-size: 13.5px; font-weight: 600; color: #1f2937; }
+.eva-people small { font-size: 12px; color: #7b8290; }
+.eva-empty { font-size: 13px; color: #7b8290; padding-top: 28px; justify-content: center; }
+
+.eva-bars { flex: 1; min-height: 120px; margin-top: 16px; display: flex; align-items: stretch; gap: 8px; }
+.eva-bars > div { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 8px; }
+.eva-bars i { display: block; width: 100%; border-radius: 3px; max-height: calc(100% - 24px); }
+.eva-bars span { height: 16px; font-size: 11.5px; color: #7b8290; }
+.eva-bars.is-striped i { background: repeating-linear-gradient(to top, #6d3fe0 0 5px, transparent 5px 8px); }
+.eva-bars.is-thin { gap: 4px; }
+.eva-bars.is-thin i { max-width: 10px; background: #5cc8d0; }
+.eva-bars.is-wide i { background: #eea73f; }
+
+@media (max-width: 1279px) { .eva-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 767px) { .eva-grid { grid-template-columns: minmax(0, 1fr); } }

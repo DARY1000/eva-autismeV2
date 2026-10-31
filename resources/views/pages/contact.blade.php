@@ -133,6 +133,7 @@
             @endif
             <form action="{{ route('contact.send') }}" method="POST">
                 @csrf
+                <x-form-guard />
                 <div class="form-group">
                     <label class="form-label" for="sujet">Objet de votre message <span>*</span></label>
                     <select class="form-control" name="subject" id="sujet" required>

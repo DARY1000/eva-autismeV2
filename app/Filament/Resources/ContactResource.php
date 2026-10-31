@@ -9,6 +9,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Collection;
 
 class ContactResource extends Resource
 {
@@ -43,9 +44,14 @@ class ContactResource extends Resource
             Forms\Components\Section::make('Gestion')->schema([
                 Forms\Components\Select::make('status')
                     ->label('Statut')
-                    ->options(['new' => 'Nouveau', 'read' => 'Lu', 'replied' => 'Répondu'])
+                    ->options(['new' => 'Nouveau', 'read' => 'Lu', 'replied' => 'Répondu', 'spam' => 'Spam'])
                     ->required(),
                 Forms\Components\TextInput::make('ip_address')->label('Adresse IP')->disabled(),
+                Forms\Components\TextInput::make('spam_reason')
+                    ->label('Raison du classement en spam')
+                    ->disabled()
+                    ->columnSpanFull()
+                    ->visible(fn(?Contact $record) => filled($record?->spam_reason)),
             ])->columns(2),
         ]);
     }
@@ -59,15 +65,11 @@ class ContactResource extends Resource
                 Tables\Columns\TextColumn::make('subject')->label('Objet')->limit(40),
                 Tables\Columns\BadgeColumn::make('status')
                     ->label('Statut')
-                    ->colors(['danger' => 'new', 'warning' => 'read', 'success' => 'replied'])
+                    ->colors(['danger' => 'new', 'warning' => 'read', 'success' => 'replied', 'gray' => 'spam'])
                     ->formatStateUsing(fn($state) => match($state) {
-                        'new' => 'Nouveau', 'read' => 'Lu', 'replied' => 'Répondu', default => $state
+                        'new' => 'Nouveau', 'read' => 'Lu', 'replied' => 'Répondu', 'spam' => 'Spam', default => $state
                     }),
                 Tables\Columns\TextColumn::make('created_at')->label('Reçu le')->dateTime('d/m/Y H:i')->sortable(),
-            ])
-            ->filters([
-                Tables\Filters\SelectFilter::make('status')
-                    ->options(['new' => 'Nouveau', 'read' => 'Lu', 'replied' => 'Répondu']),
             ])
             ->actions([
                 Tables\Actions\EditAction::make()->label('Voir / Gérer'),
@@ -76,7 +78,21 @@ class ContactResource extends Resource
                     ->icon('heroicon-m-check')
                     ->action(fn(Contact $r) => $r->update(['status' => 'read']))
                     ->visible(fn(Contact $r) => $r->status === 'new'),
+                Tables\Actions\Action::make('not_spam')
+                    ->label('Pas un spam')
+                    ->icon('heroicon-m-arrow-uturn-left')
+                    ->action(fn(Contact $r) => $r->update(['status' => 'new', 'spam_reason' => null]))
+                    ->visible(fn(Contact $r) => $r->status === 'spam'),
                 Tables\Actions\DeleteAction::make(),
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkAction::make('mark_spam')
+                    ->label('Classer en spam')
+                    ->icon('heroicon-m-no-symbol')
+                    ->requiresConfirmation()
+                    ->deselectRecordsAfterCompletion()
+                    ->action(fn(Collection $records) => $records->each->update(['status' => 'spam', 'spam_reason' => 'Classé manuellement'])),
+                Tables\Actions\DeleteBulkAction::make(),
             ])
             ->defaultSort('created_at', 'desc');
     }

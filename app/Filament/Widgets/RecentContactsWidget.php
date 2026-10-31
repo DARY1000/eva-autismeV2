@@ -16,10 +16,10 @@ class RecentContactsWidget extends BaseWidget
     public function table(Table $table): Table
     {
         return $table
-            ->query(Contact::query()->latest()->limit(5))
+            ->query(Contact::real()->latest()->limit(5))
             ->columns([
                 Tables\Columns\TextColumn::make('name')->label('Nom')->weight('bold'),
-                Tables\Columns\TextColumn::make('subject')->label('Objet')->limit(30),
+                Tables\Columns\TextColumn::make('subject')->label('Objet')->limit(20),
                 Tables\Columns\BadgeColumn::make('status')
                     ->label('Statut')
                     ->colors([
@@ -33,7 +33,7 @@ class RecentContactsWidget extends BaseWidget
                         'replied' => 'Répondu',
                         default   => $state,
                     }),
-                Tables\Columns\TextColumn::make('created_at')->label('Date')->since(),
+                Tables\Columns\TextColumn::make('created_at')->label('Reçu le')->date('d/m'),
             ])
             ->actions([
                 Tables\Actions\Action::make('view')

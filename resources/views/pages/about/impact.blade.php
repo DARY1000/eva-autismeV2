@@ -3,6 +3,40 @@
 @section('title', 'Notre Impact')
 @section('meta_description', 'Découvrez l\'impact concret d\'EVA Autisme : familles accompagnées, événements organisés, partenaires mobilisés et personnes sensibilisées au Bénin.')
 
+@section('styles')
+<style>
+.benin-layout { display:grid;grid-template-columns:1fr 1.2fr;gap:3rem;align-items:start;margin-top:2.5rem; }
+@media (max-width:900px) { .benin-layout { grid-template-columns:minmax(0,1fr);gap:2rem; } }
+.benin-group { margin-bottom:1.4rem; }
+.benin-group h4 { display:flex;align-items:center;gap:0.5rem;font-size:0.95rem;margin-bottom:0.4rem; }
+.benin-group ul { list-style:none;margin:0;padding:0 0 0 1.35rem; }
+.benin-group li, .benin-group p { font-size:0.87rem;color:var(--text-mid);margin:0 0 0.3rem; }
+.benin-group p { padding-left:1.35rem; }
+.benin-group strong { color:var(--text-dark, #1a1a2e); }
+.benin-card { background:var(--primary-light);border-radius:var(--radius-lg);padding:2rem 1.5rem; }
+.benin-card h4 { text-align:center;color:var(--primary);margin-bottom:1.25rem; }
+.benin-card svg { display:block;width:100%;max-width:370px;margin:0 auto; }
+.benin-dept { stroke:#fff;stroke-width:1.4;stroke-linejoin:round;transition:opacity 0.15s; }
+.benin-dept:hover { opacity:0.8; }
+.benin-dept.is-principal { fill:#0055A5; }
+.benin-dept.is-regulier { fill:#E8501A; }
+.benin-dept.is-expansion { fill:#F5B041; }
+.benin-dept.is-a_venir { fill:#c8d9f0; }
+.benin-label { font-size:13px;font-weight:600;text-anchor:middle;dominant-baseline:middle;fill:#23405f;pointer-events:none; }
+.benin-label.is-principal, .benin-label.is-regulier { fill:#fff; }
+.benin-label.is-callout { fill:#23405f; }
+.benin-leader { stroke:#23405f;stroke-width:0.8; }
+.benin-hq { fill:#fff;stroke:#0055A5;stroke-width:1.5; }
+.benin-legend { display:flex;flex-wrap:wrap;gap:0.5rem 1.1rem;justify-content:center;margin-top:1.1rem;font-size:0.8rem; }
+.benin-legend span { display:flex;align-items:center;gap:0.4rem; }
+.benin-swatch { display:inline-block;flex:none;width:13px;height:13px;border-radius:3px; }
+.benin-swatch.is-principal { background:#0055A5; }
+.benin-swatch.is-regulier { background:#E8501A; }
+.benin-swatch.is-expansion { background:#F5B041; }
+.benin-swatch.is-a_venir { background:#c8d9f0; }
+</style>
+@endsection
+
 @section('content')
 
 <!-- ===================== PAGE HEADER ===================== -->
@@ -255,81 +289,64 @@
             <span class="label">Couverture géographique</span>
             <h2>Notre Présence au Bénin</h2>
             <div class="section-divider"></div>
-            <p>EVA Autisme étend progressivement ses actions dans les principales villes du Bénin et ambitionne, à terme, de couvrir l'ensemble du territoire national.</p>
+            <p>EVA Autisme étend progressivement ses actions dans les départements du Bénin et ambitionne, à terme, de couvrir l'ensemble du territoire national.</p>
         </div>
 
-        <div style="display:grid;grid-template-columns:1fr 1.2fr;gap:3rem;align-items:start;margin-top:2.5rem;" class="grid-2">
+        @php
+            $departments = collect($benin['departments']);
+            // Départements du sud trop petits pour porter leur nom : étiquette à l'extérieur.
+            $callouts = ['couffo' => [46, 530], 'mono' => [46, 590], 'plateau' => [238, 510], 'oueme' => [238, 570], 'atlantique' => [120, 625], 'littoral' => [185, 625]];
+            $groups = collect(\App\Support\BeninDepartments::STATUSES)
+                ->map(fn ($label, $status) => ['label' => $label, 'items' => $departments->where('status', $status)->sortBy('name')])
+                ->filter(fn ($group) => $group['items']->isNotEmpty());
+        @endphp
 
-            <!-- Zones d'intervention -->
+        <div class="benin-layout">
+
+            <!-- Départements par statut -->
             <div class="reveal">
-                <h3 style="margin-bottom:1.5rem;color:var(--primary);">Zones d'intervention principales</h3>
+                <h3 style="margin-bottom:0.4rem;color:var(--primary);">Nos zones d'intervention</h3>
+                <p style="font-size:0.9rem;margin-bottom:1.5rem;">Présents dans {{ $departments->where('status', '!=', 'a_venir')->count() }} départements sur 12.</p>
 
-                @php
-                $zones = [
-                    ['ville' => 'Abomey-Calavi', 'desc' => 'Siège de l\'ONG – Centre d\'activités principal', 'niveau' => 100],
-                    ['ville' => 'Cotonou', 'desc' => 'Capitale économique – Événements & partenariats', 'niveau' => 80],
-                    ['ville' => 'Porto-Novo', 'desc' => 'Capitale politique – Sensibilisation institutionnelle', 'niveau' => 60],
-                    ['ville' => 'Parakou', 'desc' => 'Expansion vers le nord du Bénin', 'niveau' => 35],
-                    ['ville' => 'Ouidah', 'desc' => 'Actions communautaires et culturelles', 'niveau' => 45],
-                ];
-                @endphp
-
-                @foreach($zones as $zone)
-                <div style="margin-bottom:1.25rem;">
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">
-                        <div>
-                            <span style="font-weight:700;font-size:0.93rem;">{{ $zone['ville'] }}</span>
-                            <span style="font-size:0.8rem;color:var(--text-light);margin-left:0.5rem;">– {{ $zone['desc'] }}</span>
-                        </div>
-                        <span style="font-size:0.8rem;font-weight:600;color:var(--primary);">{{ $zone['niveau'] }}%</span>
+                @foreach($groups as $status => $group)
+                    <div class="benin-group">
+                        <h4><i class="benin-swatch is-{{ $status }}"></i>{{ $group['label'] }}</h4>
+                        @if($status === 'a_venir')
+                            <p>{{ $group['items']->pluck('name')->join(', ', ' et ') }}</p>
+                        @else
+                            <ul>
+                                @foreach($group['items'] as $department)
+                                    <li><strong>{{ $department['name'] }}</strong>@if($department['description']) – {{ $department['description'] }}@endif</li>
+                                @endforeach
+                            </ul>
+                        @endif
                     </div>
-                    <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden;">
-                        <div style="height:100%;width:{{ $zone['niveau'] }}%;background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:3px;transition:width 1s ease;"></div>
-                    </div>
-                </div>
                 @endforeach
             </div>
 
-            <!-- Carte textuelle Bénin -->
+            <!-- Carte des départements -->
             <div class="reveal">
-                <div style="background:var(--primary-light);border-radius:var(--radius-lg);padding:2.5rem;position:relative;min-height:380px;">
-                    <h4 style="text-align:center;color:var(--primary);margin-bottom:2rem;">Carte de présence – Bénin</h4>
-
-                    <!-- Représentation schématique -->
-                    <div style="position:relative;text-align:center;">
-                        <!-- SVG schématique du Bénin avec points -->
-                        <svg viewBox="0 0 200 350" style="width:100%;max-width:220px;margin:0 auto;display:block;" aria-label="Carte schématique du Bénin">
-                            <!-- Silhouette simplifiée -->
-                            <path d="M60 30 L140 30 L155 80 L150 140 L160 180 L155 230 L140 280 L120 320 L100 330 L80 320 L60 280 L45 230 L40 180 L50 140 L45 80 Z" fill="#c8d9f0" stroke="#0055A5" stroke-width="2"/>
-                            <!-- Points de présence -->
-                            <!-- Abomey-Calavi (siège) -->
-                            <circle cx="90" cy="270" r="10" fill="#0055A5" opacity="0.9"/>
-                            <text x="108" y="274" font-size="9" fill="#0055A5" font-weight="bold">Abomey-Calavi</text>
-                            <!-- Cotonou -->
-                            <circle cx="95" cy="290" r="7" fill="#E8501A" opacity="0.9"/>
-                            <text x="108" y="294" font-size="8" fill="#E8501A">Cotonou</text>
-                            <!-- Porto-Novo -->
-                            <circle cx="135" cy="278" r="6" fill="#0055A5" opacity="0.7"/>
-                            <text x="145" y="282" font-size="7" fill="#0055A5">Porto-Novo</text>
-                            <!-- Ouidah -->
-                            <circle cx="72" cy="283" r="5" fill="#0055A5" opacity="0.6"/>
-                            <text x="30" y="287" font-size="7" fill="#0055A5">Ouidah</text>
-                            <!-- Parakou -->
-                            <circle cx="100" cy="140" r="5" fill="#0055A5" opacity="0.5"/>
-                            <text x="110" y="144" font-size="7" fill="#0055A5">Parakou</text>
-                        </svg>
-
-                        <!-- Légende -->
-                        <div style="margin-top:1.5rem;display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;">
-                            <div style="display:flex;align-items:center;gap:0.4rem;font-size:0.8rem;">
-                                <div style="width:12px;height:12px;border-radius:50%;background:var(--primary);"></div>
-                                <span>Présence principale</span>
-                            </div>
-                            <div style="display:flex;align-items:center;gap:0.4rem;font-size:0.8rem;">
-                                <div style="width:12px;height:12px;border-radius:50%;background:var(--accent);"></div>
-                                <span>Activités régulières</span>
-                            </div>
-                        </div>
+                <div class="benin-card">
+                    <h4>Carte de présence – Bénin</h4>
+                    <svg viewBox="-34 -6 368 {{ $benin['height'] + 42 }}" role="img" aria-label="Carte du Bénin et de ses 12 départements, colorés selon la présence d'EVA Autisme">
+                        @foreach($benin['departments'] as $department)
+                            <path d="{{ $department['path'] }}" class="benin-dept is-{{ $department['status'] }}"><title>{{ $department['name'] }} : {{ $department['status_label'] }}</title></path>
+                        @endforeach
+                        @foreach($benin['departments'] as $key => $department)
+                @continue(isset($callouts[$key]))
+                            <text x="{{ $department['x'] }}" y="{{ $department['y'] }}" class="benin-label is-{{ $department['status'] }}">{{ $department['name'] }}</text>
+                        @endforeach
+                        @foreach($callouts as $key => [$labelX, $labelY])
+                            @php($department = $benin['departments'][$key])
+                            <line x1="{{ $department['x'] }}" y1="{{ $department['y'] }}" x2="{{ $labelX }}" y2="{{ $labelY }}" class="benin-leader"/>
+                            <text x="{{ $labelX + ($labelX > 150 ? 3 : -3) }}" y="{{ $labelY + ($labelY > 610 ? 9 : 0) }}" class="benin-label is-callout" style="text-anchor:{{ $labelY > 610 ? 'middle' : ($labelX > 150 ? 'start' : 'end') }}">{{ $department['name'] }}</text>
+                        @endforeach
+                        <circle cx="{{ $benin['headquarters']['x'] }}" cy="{{ $benin['headquarters']['y'] }}" r="3.5" class="benin-hq"><title>Siège d'EVA Autisme à Abomey-Calavi</title></circle>
+                    </svg>
+                    <div class="benin-legend">
+                        @foreach(\App\Support\BeninDepartments::STATUSES as $status => $label)
+                            <span><i class="benin-swatch is-{{ $status }}"></i>{{ $label }}</span>
+                        @endforeach
                     </div>
                 </div>
             </div>

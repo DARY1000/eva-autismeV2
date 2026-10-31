@@ -283,6 +283,7 @@
 
                         <form action="{{ route('event.register', $eid) }}" method="POST" novalidate>
                             @csrf
+                            <x-form-guard />
                             <input type="hidden" name="event_id" value="{{ $eid }}">
 
                             <div class="form-row" style="gap:1rem;">
